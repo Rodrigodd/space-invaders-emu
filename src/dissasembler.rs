@@ -2,11 +2,57 @@ use std::fmt;
 use std::fmt::Write;
 use std::ops::Range;
 
+pub fn dissasembly_around<W: Write>(w: &mut W, traced: &Vec<Range<u16>>, rom: &[u8], pc: u16) -> Result<(), fmt::Error> {
+    if let Some(range) = traced.iter().find(|&r| r.contains(&pc)) {
+        let mut i: u16 = range.start;
+        let mut ring = [i;7];
+        let mut r = 1;
+        while i < pc {
+            i += (trace_opcode(i, rom).0 & 0b11) as u16;
+            ring[r%ring.len()] = i;
+            r += 1;
+        }
+        if i != pc {
+            writeln!(w, "dissasembly fails, starts = {:04x}, i = {:04x}, pc = {:04x}", range.start, i, pc)?;
+        }
+        i = ring[r%ring.len()];
+        r = if r >= ring.len() { 0 } else { ring.len() - r };
+        for _ in 0..r {
+            println!("      :");
+        }
+        while r < 13 {
+            r += 1;
+            if i == pc {
+                write!(w, "{:04x} >> ", i).unwrap();
+            } else {
+                write!(w, "{:04x}  : ", i).unwrap();
+            }
+            i += dissasembly_opcode(w, i, rom)? as u16;
+            if i >= range.end {
+                break;
+            }
+        }
+        for _ in r..13 {
+            println!("      :");
+        }
+    } else {
+        writeln!(w, "out of traced memory")?;
+        let mut i = pc;
+        write!(w, "{:04x} >> ", i).unwrap();
+        i += dissasembly_opcode(w, i, rom)? as u16;
+        for _ in 0..6 {
+            write!(w, "{:04x}  : ", i).unwrap();
+            i += dissasembly_opcode(w, i, rom)? as u16;
+        }
+    }
+    Ok(())
+}
+
 pub fn dissasembly<W: Write>(w: &mut W, rom: &[u8]) -> Result<(), fmt::Error> {
     let mut pc = 0;
-    let read = trace(rom);
+    let traced = trace(rom);
 
-    for Range {start, end} in read {
+    for Range {start, end} in traced {
         if pc != 0 {
             writeln!(w)?;
             writeln!(w, "...")?;
@@ -28,41 +74,53 @@ pub fn dissasembly<W: Write>(w: &mut W, rom: &[u8]) -> Result<(), fmt::Error> {
 
 }
 
-fn trace(rom: &[u8]) -> Vec<Range<u16>> {
-    fn add_to_read(pc: u16, offset: u8, read: &mut Vec<Range<u16>>) {
-        let i = match read.binary_search_by_key(&pc, |r: &Range<u16>| r.start) {
-            Ok(i) => i,
-            Err(i) => i,
-        }.max(1);
-        if i < read.len() && read[i].start == pc {
-            if read[i].end < pc + offset as u16 {
-                read[i].end = pc + offset as u16;
-            }
-        } else if read[i-1].end < pc + offset as u16 {
-            if read[i-1].end >= pc {
-                if i < read.len() && read[i].start == pc as u16 {
-                    read[i-1].end = read[i].end;
-                    read.remove(i);
+pub fn trace(rom: &[u8]) -> Vec<Range<u16>> {
+    fn add_next_to_read(pc: u16, offset: u8, read: &mut Vec<Range<u16>>) -> bool {
+        match read.binary_search_by_key(&pc, |r: &Range<u16>| r.end) {
+            Ok(i) =>  {
+                if i + 1 < read.len() && read[i].end == read[i+1].start {
+                    read[i].end = read[i+1].end;
+                    read.remove(i+1);
+                    return false;
                 } else {
-                    read[i-1].end = pc + offset as u16;
+                    read[i].end = pc + offset as u16;
                 }
-            } else {
-                read.insert(i, pc..pc+offset as u16);
-            }
+            },
+            Err(_) => {
+                eprintln!("add_next_to_read assuption failed at {:04x}", pc);
+                // println!("-- fail!!");
+            },
         }
         // println!("{:04x?}", read);
+        true
+    }
+
+    fn add_jump_to_read(pc: u16, read: &mut Vec<Range<u16>>) {
+        match read.binary_search_by_key(&pc, |r: &Range<u16>| r.start) {
+            Ok(_) =>  {
+                eprintln!("add_jump_to_read assuption failed at {:04x}", pc);
+                // println!("-- jump fail!!");
+            },
+            Err(i) => {
+                read.insert(i, pc..pc);
+            },
+        }
+        // println!("{:04x?}", read);
+        // println!("--jump {:04x}", pc);
     }
 
     fn check_read(pc: u16, read: &Vec<Range<u16>>) -> bool {
-        let i = match read.binary_search_by_key(&pc, |r: &Range<u16>| r.start) {
-            Ok(i) => i,
-            Err(i) => i,
-        };
-        read[i-1].contains(&pc) || (i < read.len() && read[i].start == pc)
+        use std::cmp::Ordering;
+        read.binary_search_by(|r: &Range<u16>| 
+            if pc < r.start { Ordering::Greater } 
+            else if pc >= r.end{ Ordering::Less }
+            else { Ordering::Equal }
+        ).is_ok()
+        // read[i-1].contains(&pc) || (i < read.len() && read[i].start == pc)
     }
 
     let mut pc = 0u16;
-    let mut read = vec![0..1];
+    let mut read = vec![0..0];
     let mut jumps = Vec::new();
     let mut safety_counter = 0;
 
@@ -74,24 +132,21 @@ fn trace(rom: &[u8]) -> Vec<Range<u16>> {
 
         let (offset, jmp) = trace_opcode(pc, rom);
         if let Some(jmp) = jmp {
-            let i = match jumps.binary_search(&pc) {
-                Ok(i) => i,
-                Err(i) => i,
-            };
-            jumps.insert(i, jmp);
-        }
-        if offset < 10 {
-            if pc as usize >= rom.len() {
-                break;
-            } else {
-                add_to_read(pc, offset, &mut read);
+            if jmp < 0x4000 {
+                let i = match jumps.binary_search(&pc) {
+                    Ok(i) => i,
+                    Err(i) => i,
+                };
+                jumps.insert(i, jmp);
             }
+        }
+        if add_next_to_read(pc, offset & 0b11, &mut read) && offset < 8 {
             pc = pc + offset as u16;
         } else {
-            add_to_read(pc, offset - 10, &mut read);
             while let Some(jmp) = jumps.pop() {
                 if !check_read(jmp, &read) {
                     pc = jmp;
+                    add_jump_to_read(jmp, &mut read);
                     continue 'd;
                 }
             }
@@ -136,17 +191,17 @@ fn trace_opcode(pc: u16, rom: &[u8]) -> (u8, Option<u16>) {
         }
         0xc3 => { // JMP
             let adr = get_u16(pc, rom);
-            (13, Some(adr)) // offsets > 10 indicate the program don't continue to the next opcode
+            (8 + 3, Some(adr)) // offsets > 8 indicate the program don't continue to the next opcode
         }
         0xc9 => { // RET
-            (11, None)
+            (8 + 1, None)
         }
         0xcd => { // CALL adr
             let adr = get_u16(pc, rom);
             (3, Some(adr))
         }
         _ => {
-            (11, None)
+            (8 + 1, None)
         }
     }
 }
@@ -390,12 +445,10 @@ fn dissasembly_opcode<W: Write>(w: &mut W, pc: u16, rom: &[u8]) -> Result<u8, fm
             writeln!(w, "MOV  {}, {}", r1, r2)?; 1
         },
         r 0b01110000 => { // MOV  M, r  | Move register to memory              | 01110SSS        |  7   
-            let adr = get_u16(pc, rom);
-            writeln!(w, "MOV  {:04x}, {}", adr, r)?; 3
+            writeln!(w, "MOV  M, {}", r)?; 1
         },
         r | 0b01000110 => { // MOV  r, M  | Move memory to register              | 01DDD110        |  7   
-            let adr = get_u16(pc, rom);
-            writeln!(w, "MOV  {}, {:04x}  ", r, adr)?; 3
+            writeln!(w, "MOV  {}, M  ", r)?; 1
         },
         0b01110110 => { // HLT        | Halt                                 | 01110110        |  7   
             writeln!(w, "HLT        ")?; 1

@@ -1,5 +1,6 @@
 use std::fs;
 use std::io;
+use std::env::args;
 
 mod dissasembler;
 mod write_adapter;
@@ -12,11 +13,17 @@ use state::I8080State;
 
 
 fn main() {
-
     let mut state = I8080State::new();
     load_rom(&mut state.memory);
-    let mut stdout = WriteAdapter(io::stdout());
-    dissasembly(&mut stdout, &state.memory).unwrap();
+
+    let mut args = args();
+    let _ = args.next();
+    if args.any(|arg| arg.starts_with("-d")) {
+        let mut stdout = WriteAdapter(io::stdout());
+        dissasembly(&mut stdout, &state.memory).unwrap();
+    } else {
+        interpreter::run(&mut state);
+    }
 }
 
 

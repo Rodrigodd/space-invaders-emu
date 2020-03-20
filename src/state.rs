@@ -59,4 +59,24 @@ impl I8080State {
     pub fn set_HL(&mut self, value: u16) {
         unsafe { *(&mut self.H as *mut u8 as *mut u16) = value.to_le(); }
     }
+
+    pub fn get_op(&self) -> u8 {
+        self.memory[self.PC as usize]
+    }
+
+    pub fn get_u8(&self) -> u8 {
+        self.memory[self.PC as usize + 1]
+    }
+
+    pub fn get_u16(&self) -> u16 {
+        u16::from_le_bytes(
+            [self.memory[self.PC as usize + 1], self.memory[self.PC as usize + 2]]
+        )
+    }
+
+    pub fn print_state(&self) {
+        println!("B  C  D  E  H  L  A  Flags");
+        println!("{:02x} {:02x} {:02x} {:02x} {:02x} {:02x} {:02x} {:08b}", self.B, self.C, self.D, self.E, self.H, self.L, self.A, self.Flags);
+        println!("PC: {:04x}   SP: {:04x}", self.PC, self.SP);
+    }
 }
