@@ -453,11 +453,11 @@ fn dissasembly_opcode<W: Write>(w: &mut W, pc: u16, rom: &[u8]) -> Result<u8, fm
         0b01110110 => { // HLT        | Halt                                 | 01110110        |  7   
             writeln!(w, "HLT        ")?; 1
         },
-        r | 0b00000110 => { // MVI  r     | Move immediate register              | 00DDD110        |  7   
+        r | 0b00000110 => { // MVI  r     | Move immediate to register              | 00DDD110        |  7   
             let immediate = get_u8(pc, rom);
             writeln!(w, "MVI  {} {:02x}", r, immediate)?; 2
         },
-        0b00110110 => { // MVI  M     | Move immediate memory                | 00110110        | 10   
+        0b00110110 => { // MVI  M     | Move immediate to memory                | 00110110        | 10   
             let immediate = get_u8(pc, rom);
             writeln!(w, "MVI  M {:02x}", immediate)?; 2
         },
@@ -468,12 +468,10 @@ fn dissasembly_opcode<W: Write>(w: &mut W, pc: u16, rom: &[u8]) -> Result<u8, fm
             writeln!(w, "DCR  {}     ", r)?; 1
         },
         0b00110100 => { // INR  M     | Increment memory                     | 00110100        | 10   
-            let adr = get_u16(pc, rom);
-            writeln!(w, "INR  {:04x}     ",adr)?; 3
+            writeln!(w, "INR  M     ")?; 1
         },
         0b00110101 => { // DCR  M     | Decrement memory                     | 00110101        | 10   
-            let adr = get_u16(pc, rom);
-            writeln!(w, "DCR  {:04x}     ",adr)?; 3
+            writeln!(w, "DCR  M     ")?; 1
         },
         r 0b10000000 => { // ADD  r     | Add register to A                    | 10000SSS        |  4   
             writeln!(w, "ADD  {}     ", r)?; 1
@@ -500,36 +498,28 @@ fn dissasembly_opcode<W: Write>(w: &mut W, pc: u16, rom: &[u8]) -> Result<u8, fm
             writeln!(w, "CMP  {}     ", r)?; 1
         },
         0b10000110 => { // ADD  M     | Add memory to A                      | 10000110        |  7   
-            let adr = get_u16(pc, rom);
-            writeln!(w, "ADD  {:04x}     ",adr)?; 3
+            writeln!(w, "ADD  M     ")?; 1
         },
         0b10001110 => { // ADC  M     | Add memory to A with carry           | 10001110        |  7   
-            let adr = get_u16(pc, rom);
-            writeln!(w, "ADC  {:04x}     ",adr)?; 3
+            writeln!(w, "ADC  M     ")?; 1
         },
         0b10010110 => { // SUB  M     | Subtract memory from A               | 10010110        |  7   
-            let adr = get_u16(pc, rom);
-            writeln!(w, "SUB  {:04x}     ",adr)?; 3
+            writeln!(w, "SUB  M     ")?; 1
         },
         0b10011110 => { // SBB  M     | Subtract memory from A with borrow   | 10011110        |  7   
-            let adr = get_u16(pc, rom);
-            writeln!(w, "SBB  {:04x}     ",adr)?; 3
+            writeln!(w, "SBB  M     ")?; 1
         },
         0b10100110 => { // ANA  M     | And memory with A                    | 10100110        |  7   
-            let adr = get_u16(pc, rom);
-            writeln!(w, "ANA  {:04x}     ",adr)?; 3
+            writeln!(w, "ANA  M     ")?; 1
         },
         0b10101110 => { // XRA  M     | Exclusive Or memory with A           | 10101110        |  7   
-            let adr = get_u16(pc, rom);
-            writeln!(w, "XRA  {:04x}     ",adr)?; 3
+            writeln!(w, "XRA  M     ")?; 1
         },
         0b10110110 => { // ORA  M     | Or memory with A                     | 10110110        |  7   
-            let adr = get_u16(pc, rom);
-            writeln!(w, "ORA  {:04x}     ",adr)?; 3
+            writeln!(w, "ORA  M     ")?; 1
         },
         0b10111110 => { // CMP  M     | Compare memory with A                | 10111110        |  7   
-            let adr = get_u16(pc, rom);
-            writeln!(w, "C{:04x}P  M     ",adr)?; 3
+            writeln!(w, "CMP  M     ")?; 1
         },
         0b11000110 => { // ADI        | Add immediate to A                   | 11000110        |  7   
             let immediate = get_u8(pc, rom);
