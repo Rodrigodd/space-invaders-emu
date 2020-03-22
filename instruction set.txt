@@ -14,17 +14,17 @@ ADD  r      | Add register to A                     | 10000SSS    |  4         |
 ADC  r      | Add register to A with carry          | 10001SSS    |  4         | Z, S, P, CY, AC
 SUB  r      | Subtract register from A              | 10010SSS    |  4         | Z, S, P, CY, AC
 SBB  r      | Subtract register from A with borrow  | 10011SSS    |  4         | Z, S, P, CY, AC
-ANA  r      | And register with A                   | 10100SSS    |  4         | Z, S, P, CY, AC
-XRA  r      | Exclusive Or register with A          | 10101SSS    |  4         | Z, S, P, CY, AC
-ORA  r      | Or register with A                    | 10110SSS    |  4         | Z, S, P, CY, AC
+ANA  r      | And register with A                   | 10100SSS    |  4         | Z, S, P, CY?, AC
+XRA  r      | Exclusive Or register with A          | 10101SSS    |  4         | Z, S, P, CY?, AC
+ORA  r      | Or register with A                    | 10110SSS    |  4         | Z, S, P, CY?, AC
 CMP  r      | Compare register with A               | 10111SSS    |  4         | Z, S, P, CY, AC
 ADD  M      | Add memory to A                       | 10000110    |  7         | Z, S, P, CY, AC
 ADC  M      | Add memory to A with carry            | 10001110    |  7         | Z, S, P, CY, AC
 SUB  M      | Subtract memory from A                | 10010110    |  7         | Z, S, P, CY, AC
 SBB  M      | Subtract memory from A with borrow    | 10011110    |  7         | Z, S, P, CY, AC
-ANA  M      | And memory with A                     | 10100110    |  7         | Z, S, P, CY, AC
-XRA  M      | Exclusive Or memory with A            | 10101110    |  7         | Z, S, P, CY, AC
-ORA  M      | Or memory with A                      | 10110110    |  7         | Z, S, P, CY, AC
+ANA  M      | And memory with A                     | 10100110    |  7         | Z, S, P, CY?, AC
+XRA  M      | Exclusive Or memory with A            | 10101110    |  7         | Z, S, P, CY?, AC
+ORA  M      | Or memory with A                      | 10110110    |  7         | Z, S, P, CY?, AC
 CMP  M      | Compare memory with A                 | 10111110    |  7         | Z, S, P, CY, AC
 ADI         | Add immediate to A                    | 11000110    |  7         | Z, S, P, CY, AC
 ACI         | Add immediate to A with carry         | 11001110    |  7         | Z, S, P, CY, AC

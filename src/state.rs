@@ -130,6 +130,10 @@ impl I8080State {
         self.Flags = (self.Flags & !1) | carry as u8;
     }
 
+    pub fn on_aux_carry(&self) -> bool {
+        (self.Flags & 0b0001_0000) != 0
+    }
+
     pub fn on_carry(&self) -> bool {
         (self.Flags & 0b0000_0001) != 0
     }
@@ -147,7 +151,7 @@ impl I8080State {
     }
 
     pub fn print_state<W: std::fmt::Write>(&self, w: &mut W) {
-        writeln!(w, "B  C  D  E  H  L  A  Flags").unwrap();
+        writeln!(w, "B  C  D  E  H  L  A  SZ_A_P_C <- Flags").unwrap();
         writeln!(w, "{:02x} {:02x} {:02x} {:02x} {:02x} {:02x} {:02x} {:08b}", self.B, self.C, self.D, self.E, self.H, self.L, self.A, self.Flags).unwrap();
         writeln!(w, "PC: {:04x}   SP: {:04x}", self.get_PC(), self.get_SP()).unwrap();
     }

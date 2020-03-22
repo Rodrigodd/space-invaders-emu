@@ -796,7 +796,7 @@ fn dissasembly_opcode<W: Write>(w: &mut W, pc: u16, rom: &[u8]) -> Result<u8, fm
             writeln!(w, "NOP        ")?; 1
         },        
         _ => {
-            writeln!(w, "<UNDEFINED>")?;
+            writeln!(w, "<UNDEFINED OPCODE {:04X}>", rom[pc as usize])?;
             1
         }
     })

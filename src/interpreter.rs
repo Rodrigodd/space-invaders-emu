@@ -1,8 +1,6 @@
 use crate::state::I8080State;
 use crate::dissasembler;
 
-use std::io::stdin;
-use std::io::Read;
 use std::sync::mpsc::{channel, Sender};
 use std::thread;
 
@@ -32,6 +30,7 @@ pub fn start(mut state: I8080State) -> Sender<Message> {
 
     thread::spawn(move || loop {
         let mut w = WriteAdapter(io::BufWriter::new(stdout.lock()));
+        writeln!(w).unwrap();
         dissasembly_around(&mut w, &traced, &state.memory, state.get_PC()).unwrap();
         writeln!(w).unwrap();
         state.print_state(&mut w);
@@ -47,7 +46,6 @@ pub fn start(mut state: I8080State) -> Sender<Message> {
                 Ok(Message::Step) => break,
                 Ok(Message::Debug) => { interpreter_state = State::Running; break; },
                 Err(_) => return,
-                _ => {},
             }}
             State::Running => match recv.try_recv() {
                 Ok(Message::Debug) => interpreter_state = State::Debugging,
@@ -344,110 +342,145 @@ fn interpret_opcode(state: &mut I8080State) -> u16 {
             1
         },
         r 0b10000000 => { // ADD  r     | Add register to A                    | 10000SSS        |  4   
-            println!("{:04x}  : op {:02x} is unimplemented", state.get_PC(), state.get_op());
+            let (sum, carry) = state.A.overflowing_add(r);
+            state.set_flags(sum, carry, (state.A & 0xf) + (r & 0xf) > 0xf);
+            state.A = sum;
             1
         },
         r 0b10001000 => { // ADC  r     | Add register to A with carry         | 10001SSS        |  4   
-            println!("{:04x}  : op {:02x} is unimplemented", state.get_PC(), state.get_op());
+            let (sum, carry) = state.A.overflowing_add(r + state.on_carry() as u8);
+            state.set_flags(sum, carry, (state.A & 0xf) + (r & 0xf) + state.on_carry() as u8 > 0xf);
+            state.A = sum;
             1
         },
         r 0b10010000 => { // SUB  r     | Subtract register from A             | 10010SSS        |  4   
-            println!("{:04x}  : op {:02x} is unimplemented", state.get_PC(), state.get_op());
+            let (sum, carry) = state.A.overflowing_sub(r);
+            state.set_flags(sum, carry, (state.A & 0xf) + (-(r as i8) as u8 & 0xf) > 0xf);
+            state.A = sum;
             1
         },
         r 0b10011000 => { // SBB  r     | Subtract register from A with borrow | 10011SSS        |  4   
-            println!("{:04x}  : op {:02x} is unimplemented", state.get_PC(), state.get_op());
+            let (sum, carry) = state.A.overflowing_sub(r.wrapping_add(1));
+            state.set_flags(sum, carry, (state.A & 0xf) + (-(r.wrapping_add(1) as i8) as u8 & 0xf) > 0xf);
+            state.A = sum;
             1
         },
         r 0b10100000 => { // ANA  r     | And register with A                  | 10100SSS        |  4   
-            println!("{:04x}  : op {:02x} is unimplemented", state.get_PC(), state.get_op());
+            state.A = state.A & r;
+            state.set_flags(state.A, false, state.on_aux_carry());
             1
         },
         r 0b10101000 => { // XRA  r     | Exclusive Or register with A         | 10101SSS        |  4   
-            println!("{:04x}  : op {:02x} is unimplemented", state.get_PC(), state.get_op());
+            state.A = state.A ^ r;
+            state.set_flags(state.A, false, state.on_aux_carry());
             1
         },
         r 0b10110000 => { // ORA  r     | Or register with A                   | 10110SSS        |  4   
-            println!("{:04x}  : op {:02x} is unimplemented", state.get_PC(), state.get_op());
+            state.A = state.A | r;
+            state.set_flags(state.A, false, state.on_aux_carry());
             1
         },
         r 0b10111000 => { // CMP  r     | Compare register with A              | 10111SSS        |  4   
-            println!("{:04x}  : op {:02x} is unimplemented", state.get_PC(), state.get_op());
+            let (sum, carry) = state.A.overflowing_sub(r);
+            state.set_flags(sum, carry, ((state.A & 0xf) + ((-(r as i8)) as u8 & 0xf)) > 0xf );
             1
         },
         0b10000110 => { // ADD  M     | Add memory to A                      | 10000110        |  7   
-            let adr = state.get_u16();
-            println!("{:04x}  : op {:02x} is unimplemented", state.get_PC(), state.get_op());
+            let value = state.get_memory(state.get_HL());
+            let (sum, carry) = state.A.overflowing_add(value);
+            state.set_flags(sum, carry, (state.A & 0xf) + (value & 0xf) > 0xf);
+            state.A = sum;
             1
         },
         0b10001110 => { // ADC  M     | Add memory to A with carry           | 10001110        |  7   
-            let adr = state.get_u16();
-            println!("{:04x}  : op {:02x} is unimplemented", state.get_PC(), state.get_op());
+            let value = state.get_memory(state.get_HL());
+            let (sum, carry) = state.A.overflowing_add(value + state.on_carry() as u8);
+            state.set_flags(sum, carry, (state.A & 0xf) + (value & 0xf) + state.on_carry() as u8 > 0xf);
+            state.A = sum;
             1
         },
         0b10010110 => { // SUB  M     | Subtract memory from A               | 10010110        |  7   
-            let adr = state.get_u16();
-            println!("{:04x}  : op {:02x} is unimplemented", state.get_PC(), state.get_op());
+            let value = state.get_memory(state.get_HL());
+            let (sum, carry) = state.A.overflowing_sub(value);
+            state.set_flags(sum, carry, (state.A & 0xf) + (-(value as i8) as u8 & 0xf) > 0xf);
+            state.A = sum;
             1
         },
         0b10011110 => { // SBB  M     | Subtract memory from A with borrow   | 10011110        |  7   
-            let adr = state.get_u16();
-            println!("{:04x}  : op {:02x} is unimplemented", state.get_PC(), state.get_op());
+            let value = state.get_memory(state.get_HL());
+            let (sum, carry) = state.A.overflowing_sub(value.wrapping_add(1));
+            state.set_flags(sum, carry, (state.A & 0xf) + (-(value.wrapping_add(1) as i8) as u8 & 0xf) > 0xf);
+            state.A = sum;
             1
         },
         0b10100110 => { // ANA  M     | And memory with A                    | 10100110        |  7   
-            let adr = state.get_u16();
-            println!("{:04x}  : op {:02x} is unimplemented", state.get_PC(), state.get_op());
+            let value = state.get_memory(state.get_HL());
+            state.A = state.A & value;
+            state.set_flags(state.A, false, state.on_aux_carry());
             1
         },
         0b10101110 => { // XRA  M     | Exclusive Or memory with A           | 10101110        |  7   
-            let adr = state.get_u16();
-            println!("{:04x}  : op {:02x} is unimplemented", state.get_PC(), state.get_op());
+            let value = state.get_memory(state.get_HL());
+            state.A = state.A ^ value;
+            state.set_flags(state.A, false, state.on_aux_carry());
             1
         },
         0b10110110 => { // ORA  M     | Or memory with A                     | 10110110        |  7   
-            let adr = state.get_u16();
-            println!("{:04x}  : op {:02x} is unimplemented", state.get_PC(), state.get_op());
+            let value = state.get_memory(state.get_HL());
+            state.A = state.A | value;
+            state.set_flags(state.A, false, state.on_aux_carry());
             1
         },
         0b10111110 => { // CMP  M     | Compare memory with A                | 10111110        |  7   
-            let adr = state.get_u16();
-            println!("{:04x}  : op {:02x} is unimplemented", state.get_PC(), state.get_op());
+            let value = state.get_memory(state.get_HL());
+            let (sum, carry) = state.A.overflowing_sub(value);
+            state.set_flags(sum, carry, ((state.A & 0xf) + ((-(value as i8)) as u8 & 0xf)) > 0xf );
             1
         },
         0b11000110 => { // ADI        | Add immediate to A                   | 11000110        |  7   
             let immediate = state.get_u8();
-            println!("{:04x}  : op {:02x} is unimplemented", state.get_PC(), state.get_op());
+            let (sum, carry) = state.A.overflowing_add(immediate);
+            state.set_flags(sum, carry, (state.A & 0xf) + (immediate & 0xf) > 0xf);
+            state.A = sum;
             2
         },
         0b11001110 => { // ACI        | Add immediate to A with carry        | 11001110        |  7   
             let immediate = state.get_u8();
-            println!("{:04x}  : op {:02x} is unimplemented", state.get_PC(), state.get_op());
+            let (sum, carry) = state.A.overflowing_add(immediate + state.on_carry() as u8);
+            state.set_flags(sum, carry, (state.A & 0xf) + (immediate & 0xf) + state.on_carry() as u8 > 0xf);
+            state.A = sum;
             2
         },
         0b11010110 => { // SUI        | Subtract immediate from A            | 11010110        |  7   
             let immediate = state.get_u8();
-            println!("{:04x}  : op {:02x} is unimplemented", state.get_PC(), state.get_op());
+            let (sum, carry) = state.A.overflowing_sub(immediate);
+            state.set_flags(sum, carry, (state.A & 0xf) + (-(immediate as i8) as u8 & 0xf) > 0xf);
+            state.A = sum;
             2
         },
         0b11011110 => { // SBI        | Subtract immediate from A with borrow| 11011110        |  7   
             let immediate = state.get_u8();
-            println!("{:04x}  : op {:02x} is unimplemented", state.get_PC(), state.get_op());
+            let (sum, carry) = state.A.overflowing_sub(immediate.wrapping_add(1));
+            state.set_flags(sum, carry, (state.A & 0xf) + (-(immediate.wrapping_add(1) as i8) as u8 & 0xf) > 0xf);
+            state.A = sum;
             2
         },
         0b11100110 => { // ANI        | And immediate with A                 | 11100110        |  7   
             let immediate = state.get_u8();
-            println!("{:04x}  : op {:02x} is unimplemented", state.get_PC(), state.get_op());
+            state.A = state.A & immediate;
+            state.set_flags(state.A, false, state.on_aux_carry());
             2
         },
         0b11101110 => { // XRI        | Exclusive Or immediate with A        | 11101110        |  7   
             let immediate = state.get_u8();
-            println!("{:04x}  : op {:02x} is unimplemented", state.get_PC(), state.get_op());
+            state.A = state.A ^ immediate;
+            state.set_flags(state.A, false, state.on_aux_carry());
             2
         },
         0b11110110 => { // ORI        | Or immediate with A                  | 11110110        |  7   
             let immediate = state.get_u8();
-            println!("{:04x}  : op {:02x} is unimplemented", state.get_PC(), state.get_op());
+            state.A = state.A | immediate;
+            state.set_flags(state.A, false, state.on_aux_carry());
             2
         },
         0b11111110 => { // CPI        | Compare immediate with A             | 11111110        |  7   
@@ -671,8 +704,10 @@ fn interpret_opcode(state: &mut I8080State) -> u16 {
             } else { 1 }
         },
         _ if state.get_op() & 0b11000111 == 0b11000111 => { // RST        | Restart                              | 11AAA111        | 11   
-            println!("{:04x}  : op {:02x} is unimplemented", state.get_PC(), state.get_op());
-            1
+            let adress = state.get_op() & 0b00111000;
+            state.push_stack(state.get_PC() + 3);
+            state.set_PC(adress as u16);
+            0
         },
         0b11011011 => { // IN         | Input                                | 11011011        | 10   
             let device = state.get_u8();
@@ -751,20 +786,27 @@ fn interpret_opcode(state: &mut I8080State) -> u16 {
             3
         },
         0b11101011 => { // XCHG       | Exchange D & E, H & L Registers      | 11101011        | 4    
-            println!("{:04x}  : op {:02x} is unimplemented", state.get_PC(), state.get_op());
+            let de = state.get_DE();
+            state.set_DE(state.get_HL());
+            state.set_HL(de);
             1
         },
         0b11100011 => { // XTHL       | Exchange top of stack, H & L         | 11100011        | 18   
-            println!("{:04x}  : op {:02x} is unimplemented", state.get_PC(), state.get_op());
+            let b2 = state.get_memory(state.get_SP() + 1);
+            let b1 = state.get_memory(state.get_SP());
+            state.set_memory(state.get_SP() + 1, state.H);
+            state.set_memory(state.get_SP(), state.L);
+            state.H = b2;
+            state.L = b1;
             1
         },
         0b11111001 => { // SPHL       | H & L to stack pointer               | 11111001        | 5    
-            println!("{:04x}  : op {:02x} is unimplemented", state.get_PC(), state.get_op());
+            state.set_SP(state.get_HL());
             1
         },
         0b11101001 => { // PCHL       | H & L to program counter             | 11101001        | 5    
-            println!("{:04x}  : op {:02x} is unimplemented", state.get_PC(), state.get_op());
-            1
+            state.set_PC(state.get_HL());
+            0
         },
         0b00001001 => { // DAD  B     | Add B & C to H & L                   | 00001001        | 10   
             let (sum, carry) = state.get_BC().overflowing_add(state.get_HL());
@@ -843,29 +885,42 @@ fn interpret_opcode(state: &mut I8080State) -> u16 {
             1
         },
         0b00101111 => { // CMA        | Complement A                         | 00101111        | 4    
-            println!("{:04x}  : op {:02x} is unimplemented", state.get_PC(), state.get_op());
+            state.A = !state.A;
             1
         },
         0b00110111 => { // STC        | Set carry                            | 00110111        | 4    
-            println!("{:04x}  : op {:02x} is unimplemented", state.get_PC(), state.get_op());
+            state.set_carry(true);
             1
         },
         0b00111111 => { // CMC        | Complement carry                     | 00111111        | 4    
-            println!("{:04x}  : op {:02x} is unimplemented", state.get_PC(), state.get_op());
+            state.set_carry(!state.on_carry());
             1
         },
         0b00100111 => { // DAA        | Decimal adjust A                     | 00100111        | 4    
-            println!("{:04x}  : op {:02x} is unimplemented", state.get_PC(), state.get_op());
+            let mut carry = state.on_carry();
+            let mut aux_carry = false;
+            if state.A & 0xf > 9 || state.on_aux_carry() {
+                aux_carry = state.A & 0xf + 6 > 0xf;
+                state.A += 6;
+            }
+            if state.A & 0xf0 >> 4 > 9 || state.on_carry() {
+                let (sum, c) = state.A.overflowing_add(6 << 4);
+                state.A = sum;
+                carry = carry || c;
+            }
+            state.set_flags(state.A, carry, aux_carry);
             1
         },
         0b00100010 => { // SHLD       | Store H & L direct                   | 00100010        | 16   
-            let immediate = state.get_u16();
-            println!("{:04x}  : op {:02x} is unimplemented", state.get_PC(), state.get_op());
+            let adr = state.get_u16();
+            state.set_memory(adr, state.L);
+            state.set_memory(adr+1, state.H);
             3
         },
         0b00101010 => { // LHLD       | Load H & L direct                    | 00101010        | 16   
-            let immediate = state.get_u16();
-            println!("{:04x}  : op {:02x} is unimplemented", state.get_PC(), state.get_op());
+            let adr = state.get_u16();
+            state.L = state.get_memory(adr);
+            state.H = state.get_memory(adr+1);
             3
         },
         0b11111011 => { // EI         | Enable Interrupts                    | 11111011        | 4    
@@ -880,7 +935,7 @@ fn interpret_opcode(state: &mut I8080State) -> u16 {
             1
         },        
         _ => {
-            println!("{:04x}  : op {:02x} is unimplemented", state.get_PC(), state.get_op());
+            println!("<{:04x}: UNDEFINED OPCODE {:02X}>", state.get_PC(), state.get_op());
             1
         }
     }
