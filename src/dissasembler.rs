@@ -4,8 +4,9 @@ use std::ops::Range;
 
 pub fn dissasembly_around<W: Write>(w: &mut W, traced: &Vec<Range<u16>>, rom: &[u8], pc: u16) -> Result<(), fmt::Error> {
     if let Some(range) = traced.iter().find(|&r| r.contains(&pc)) {
+        const AROUND: usize = 8usize;
         let mut i: u16 = range.start;
-        let mut ring = [i;7];
+        let mut ring = [i;AROUND + 1];
         let mut r = 1;
         while i < pc {
             i += (trace_opcode(i, rom).0 & 0b11) as u16;
@@ -18,9 +19,9 @@ pub fn dissasembly_around<W: Write>(w: &mut W, traced: &Vec<Range<u16>>, rom: &[
         i = ring[r%ring.len()];
         r = if r >= ring.len() { 0 } else { ring.len() - r };
         for _ in 0..r {
-            println!("      :");
+            writeln!(w,"      :").unwrap();
         }
-        while r < 13 {
+        while r < 2*AROUND+1 {
             r += 1;
             if i == pc {
                 write!(w, "{:04x} >> ", i).unwrap();
@@ -32,8 +33,8 @@ pub fn dissasembly_around<W: Write>(w: &mut W, traced: &Vec<Range<u16>>, rom: &[
                 break;
             }
         }
-        for _ in r..13 {
-            println!("      :");
+        for _ in r..2*AROUND+1 {
+            writeln!(w,"      :").unwrap();
         }
     } else {
         writeln!(w, "out of traced memory")?;
@@ -647,7 +648,7 @@ fn dissasembly_opcode<W: Write>(w: &mut W, pc: u16, rom: &[u8]) -> Result<u8, fm
             writeln!(w, "RPO        ")?; 1
         },
         _ if rom[pc as usize] & 0b11000111 == 0b11000111 => { // RST        | Restart                              | 11AAA111        | 11   
-            writeln!(w, "RST {:03b}   ", (rom[pc as usize] & 0b00111000) >> 3 )?; 1
+            writeln!(w, "RST {:04x}   ", rom[pc as usize] & 0b00111000 )?; 1
         },
         0b11011011 => { // IN         | Input                                | 11011011        | 10   
             let device = get_u8(pc, rom);
