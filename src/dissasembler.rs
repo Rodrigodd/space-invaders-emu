@@ -218,145 +218,145 @@ macro_rules! ops {
                 let $r1 = "B"; let $r2 = "B"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b000001 => {
-                let $r1 = "C"; let $r2 = "B"; $y
+                let $r1 = "B"; let $r2 = "C"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b000010 => {
-                let $r1 = "D"; let $r2 = "B"; $y
+                let $r1 = "B"; let $r2 = "D"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b000011 => {
-                let $r1 = "E"; let $r2 = "B"; $y
+                let $r1 = "B"; let $r2 = "E"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b000100 => {
-                let $r1 = "H"; let $r2 = "B"; $y
+                let $r1 = "B"; let $r2 = "H"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b000101 => {
-                let $r1 = "L"; let $r2 = "B"; $y
+                let $r1 = "B"; let $r2 = "L"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b000111 => {
-                let $r1 = "A"; let $r2 = "B"; $y
+                let $r1 = "B"; let $r2 = "A"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b001000 => {
-                let $r1 = "B"; let $r2 = "C"; $y
+                let $r1 = "C"; let $r2 = "B"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b001001 => {
                 let $r1 = "C"; let $r2 = "C"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b001010 => {
-                let $r1 = "D"; let $r2 = "C"; $y
+                let $r1 = "C"; let $r2 = "D"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b001011 => {
-                let $r1 = "E"; let $r2 = "C"; $y
+                let $r1 = "C"; let $r2 = "E"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b001100 => {
-                let $r1 = "H"; let $r2 = "C"; $y
+                let $r1 = "C"; let $r2 = "H"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b001101 => {
-                let $r1 = "L"; let $r2 = "C"; $y
+                let $r1 = "C"; let $r2 = "L"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b001111 => {
-                let $r1 = "A"; let $r2 = "C"; $y
+                let $r1 = "C"; let $r2 = "A"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b010000 => {
-                let $r1 = "B"; let $r2 = "D"; $y
+                let $r1 = "D"; let $r2 = "B"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b010001 => {
-                let $r1 = "C"; let $r2 = "D"; $y
+                let $r1 = "D"; let $r2 = "C"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b010010 => {
                 let $r1 = "D"; let $r2 = "D"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b010011 => {
-                let $r1 = "E"; let $r2 = "D"; $y
+                let $r1 = "D"; let $r2 = "E"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b010100 => {
-                let $r1 = "H"; let $r2 = "D"; $y
+                let $r1 = "D"; let $r2 = "H"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b010101 => {
-                let $r1 = "L"; let $r2 = "D"; $y
+                let $r1 = "D"; let $r2 = "L"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b010111 => {
-                let $r1 = "A"; let $r2 = "D"; $y
+                let $r1 = "D"; let $r2 = "A"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b011000 => {
-                let $r1 = "B"; let $r2 = "E"; $y
+                let $r1 = "E"; let $r2 = "B"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b011001 => {
-                let $r1 = "C"; let $r2 = "E"; $y
+                let $r1 = "E"; let $r2 = "C"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b011010 => {
-                let $r1 = "D"; let $r2 = "E"; $y
+                let $r1 = "E"; let $r2 = "D"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b011011 => {
                 let $r1 = "E"; let $r2 = "E"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b011100 => {
-                let $r1 = "H"; let $r2 = "E"; $y
+                let $r1 = "E"; let $r2 = "H"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b011101 => {
-                let $r1 = "L"; let $r2 = "E"; $y
+                let $r1 = "E"; let $r2 = "L"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b011111 => {
-                let $r1 = "A"; let $r2 = "E"; $y
+                let $r1 = "E"; let $r2 = "A"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b100000 => {
-                let $r1 = "B"; let $r2 = "H"; $y
+                let $r1 = "H"; let $r2 = "B"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b100001 => {
-                let $r1 = "C"; let $r2 = "H"; $y
+                let $r1 = "H"; let $r2 = "C"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b100010 => {
-                let $r1 = "D"; let $r2 = "H"; $y
+                let $r1 = "H"; let $r2 = "D"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b100011 => {
-                let $r1 = "E"; let $r2 = "H"; $y
+                let $r1 = "H"; let $r2 = "E"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b100100 => {
                 let $r1 = "H"; let $r2 = "H"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b100101 => {
-                let $r1 = "L"; let $r2 = "H"; $y
+                let $r1 = "H"; let $r2 = "L"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b100111 => {
-                let $r1 = "A"; let $r2 = "H"; $y
+                let $r1 = "H"; let $r2 = "A"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b101000 => {
-                let $r1 = "B"; let $r2 = "L"; $y
+                let $r1 = "L"; let $r2 = "B"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b101001 => {
-                let $r1 = "C"; let $r2 = "L"; $y
+                let $r1 = "L"; let $r2 = "C"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b101010 => {
-                let $r1 = "D"; let $r2 = "L"; $y
+                let $r1 = "L"; let $r2 = "D"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b101011 => {
-                let $r1 = "E"; let $r2 = "L"; $y
+                let $r1 = "L"; let $r2 = "E"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b101100 => {
-                let $r1 = "H"; let $r2 = "L"; $y
+                let $r1 = "L"; let $r2 = "H"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b101101 => {
                 let $r1 = "L"; let $r2 = "L"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b101111 => {
-                let $r1 = "A"; let $r2 = "L"; $y
+                let $r1 = "L"; let $r2 = "A"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b111000 => {
-                let $r1 = "B"; let $r2 = "A"; $y
+                let $r1 = "A"; let $r2 = "B"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b111001 => {
-                let $r1 = "C"; let $r2 = "A"; $y
+                let $r1 = "A"; let $r2 = "C"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b111010 => {
-                let $r1 = "D"; let $r2 = "A"; $y
+                let $r1 = "A"; let $r2 = "D"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b111011 => {
-                let $r1 = "E"; let $r2 = "A"; $y
+                let $r1 = "A"; let $r2 = "E"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b111100 => {
-                let $r1 = "H"; let $r2 = "A"; $y
+                let $r1 = "A"; let $r2 = "H"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b111101 => {
-                let $r1 = "L"; let $r2 = "A"; $y
+                let $r1 = "A"; let $r2 = "L"; $y
             },
             _ if $rom[$pc as usize] == $x + 0b111111 => {
                 let $r1 = "A"; let $r2 = "A"; $y

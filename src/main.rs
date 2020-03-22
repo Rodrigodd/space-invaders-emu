@@ -1,3 +1,10 @@
+use winit::{
+    event::{Event, WindowEvent, KeyboardInput, ElementState, VirtualKeyCode},
+    event_loop::{ControlFlow, EventLoop},
+    window::WindowBuilder,
+    dpi::LogicalSize,
+};
+
 use std::fs;
 use std::io;
 use std::env::args;
@@ -22,8 +29,48 @@ fn main() {
         let mut stdout = WriteAdapter(io::stdout());
         dissasembly(&mut stdout, &state.memory).unwrap();
     } else {
-        interpreter::run(&mut state);
+        main_loop(state);
     }
+}
+
+fn main_loop(state: I8080State) {
+    let event_loop = EventLoop::new();
+    let window = WindowBuilder::new()
+        .with_inner_size(LogicalSize::new(200, 150))
+        .build(&event_loop)
+        .unwrap();
+
+    let sender = interpreter::start(state);
+
+    event_loop.run(move |event, _, control_flow| {
+        *control_flow = ControlFlow::Wait;
+
+        match event {
+            Event::WindowEvent {
+                event,
+                window_id,
+            } if window_id == window.id() => match event {
+                WindowEvent::CloseRequested => *control_flow = ControlFlow::Exit,
+                WindowEvent::KeyboardInput {
+                    input: KeyboardInput { virtual_keycode: Some(key), state: ElementState::Pressed, .. },
+                    is_synthetic: false,
+                    .. 
+                }  => match key {
+                    VirtualKeyCode::Right => match sender.send(interpreter::Message::Step) {
+                        Ok(()) => (),
+                        Err(_) => *control_flow = ControlFlow::Exit,
+                    },
+                    VirtualKeyCode::Return => match sender.send(interpreter::Message::Debug) {
+                        Ok(()) => (),
+                        Err(_) => *control_flow = ControlFlow::Exit,
+                    },
+                    _ => (),
+                }
+                _ => ()
+            },
+            _ => (),
+        }
+    });
 }
 
 

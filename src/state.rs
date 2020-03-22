@@ -147,8 +147,8 @@ impl I8080State {
     }
 
     pub fn print_state<W: std::fmt::Write>(&self, w: &mut W) {
-        writeln!(w, "B  C  D  E  H  L  A  Flags");
-        writeln!(w, "{:02x} {:02x} {:02x} {:02x} {:02x} {:02x} {:02x} {:08b}", self.B, self.C, self.D, self.E, self.H, self.L, self.A, self.Flags);
-        writeln!(w, "PC: {:04x}   SP: {:04x}", self.get_PC(), self.get_SP());
+        writeln!(w, "B  C  D  E  H  L  A  Flags").unwrap();
+        writeln!(w, "{:02x} {:02x} {:02x} {:02x} {:02x} {:02x} {:02x} {:08b}", self.B, self.C, self.D, self.E, self.H, self.L, self.A, self.Flags).unwrap();
+        writeln!(w, "PC: {:04x}   SP: {:04x}", self.get_PC(), self.get_SP()).unwrap();
     }
 }

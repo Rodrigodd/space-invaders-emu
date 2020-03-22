@@ -1,33 +1,63 @@
 use crate::state::I8080State;
 use crate::dissasembler;
 
-// use std::thread;
-// use std::time::Duration;
 use std::io::stdin;
 use std::io::Read;
+use std::sync::mpsc::{channel, Sender};
+use std::thread;
 
 
-pub fn run(state: &mut I8080State) {
+pub enum Message {
+    Debug,
+    Step,
+}
+
+/// Start the interpreter in a new thread. Return a sender for communication.
+pub fn start(mut state: I8080State) -> Sender<Message> {
     use crate::dissasembler::dissasembly_around;
     use crate::write_adapter::WriteAdapter;
     use std::io;
     use std::fmt::Write;
 
+    enum State {
+        Debugging,
+        Running,
+    }
+
     let traced = dissasembler::trace(&state.memory);
     let stdout = io::stdout();
-    loop {
-        
+    let mut interpreter_state = State::Debugging;
+
+    let (send, recv) = channel();
+
+    thread::spawn(move || loop {
         let mut w = WriteAdapter(io::BufWriter::new(stdout.lock()));
         dissasembly_around(&mut w, &traced, &state.memory, state.get_PC()).unwrap();
         writeln!(w).unwrap();
         state.print_state(&mut w);
         drop(w);
 
-        let of = interpret_opcode(state);
+        let of = interpret_opcode(&mut state);
         state.set_PC(state.get_PC() + of);
+
+        use std::sync::mpsc::TryRecvError;
         
-        stdin().read_line(&mut String::new()).unwrap();
-    }
+        match interpreter_state {
+            State::Debugging => loop { match recv.recv() {
+                Ok(Message::Step) => break,
+                Ok(Message::Debug) => { interpreter_state = State::Running; break; },
+                Err(_) => return,
+                _ => {},
+            }}
+            State::Running => match recv.try_recv() {
+                Ok(Message::Debug) => interpreter_state = State::Debugging,
+                Err(TryRecvError::Disconnected) => return,
+                _ => {}
+            }
+        }
+    });
+
+    send
 }
 
 macro_rules! as_expr {
@@ -39,130 +69,130 @@ macro_rules! ops {
     (@rule $state:expr; ($r1:ident $r2:ident | $x:expr => $y:expr, $($tail:tt)*) -> ($($accum:tt)*) ) => {
         ops!(@rule $state; ($($tail)*) -> ( $($accum)*
             _ if $state.get_op() == $x + 0b000001 => {
-                let $r1 = &mut $state.C; let $r2 = &$state.B; $y
-            },
-            _ if $state.get_op() == $x + 0b000010 => {
-                let $r1 = &mut $state.D; let $r2 = &$state.B; $y
-            },
-            _ if $state.get_op() == $x + 0b000011 => {
-                let $r1 = &mut $state.E; let $r2 = &$state.B; $y
-            },
-            _ if $state.get_op() == $x + 0b000100 => {
-                let $r1 = &mut $state.H; let $r2 = &$state.B; $y
-            },
-            _ if $state.get_op() == $x + 0b000101 => {
-                let $r1 = &mut $state.L; let $r2 = &$state.B; $y
-            },
-            _ if $state.get_op() == $x + 0b000111 => {
-                let $r1 = &mut $state.A; let $r2 = &$state.B; $y
-            },
-            _ if $state.get_op() == $x + 0b001000 => {
                 let $r1 = &mut $state.B; let $r2 = &$state.C; $y
             },
-            _ if $state.get_op() == $x + 0b001010 => {
-                let $r1 = &mut $state.D; let $r2 = &$state.C; $y
-            },
-            _ if $state.get_op() == $x + 0b001011 => {
-                let $r1 = &mut $state.E; let $r2 = &$state.C; $y
-            },
-            _ if $state.get_op() == $x + 0b001100 => {
-                let $r1 = &mut $state.H; let $r2 = &$state.C; $y
-            },
-            _ if $state.get_op() == $x + 0b001101 => {
-                let $r1 = &mut $state.L; let $r2 = &$state.C; $y
-            },
-            _ if $state.get_op() == $x + 0b001111 => {
-                let $r1 = &mut $state.A; let $r2 = &$state.C; $y
-            },
-            _ if $state.get_op() == $x + 0b010000 => {
+            _ if $state.get_op() == $x + 0b000010 => {
                 let $r1 = &mut $state.B; let $r2 = &$state.D; $y
             },
-            _ if $state.get_op() == $x + 0b010001 => {
-                let $r1 = &mut $state.C; let $r2 = &$state.D; $y
-            },
-            _ if $state.get_op() == $x + 0b010011 => {
-                let $r1 = &mut $state.E; let $r2 = &$state.D; $y
-            },
-            _ if $state.get_op() == $x + 0b010100 => {
-                let $r1 = &mut $state.H; let $r2 = &$state.D; $y
-            },
-            _ if $state.get_op() == $x + 0b010101 => {
-                let $r1 = &mut $state.L; let $r2 = &$state.D; $y
-            },
-            _ if $state.get_op() == $x + 0b010111 => {
-                let $r1 = &mut $state.A; let $r2 = &$state.D; $y
-            },
-            _ if $state.get_op() == $x + 0b011000 => {
+            _ if $state.get_op() == $x + 0b000011 => {
                 let $r1 = &mut $state.B; let $r2 = &$state.E; $y
             },
-            _ if $state.get_op() == $x + 0b011001 => {
-                let $r1 = &mut $state.C; let $r2 = &$state.E; $y
-            },
-            _ if $state.get_op() == $x + 0b011010 => {
-                let $r1 = &mut $state.D; let $r2 = &$state.E; $y
-            },
-            _ if $state.get_op() == $x + 0b011100 => {
-                let $r1 = &mut $state.H; let $r2 = &$state.E; $y
-            },
-            _ if $state.get_op() == $x + 0b011101 => {
-                let $r1 = &mut $state.L; let $r2 = &$state.E; $y
-            },
-            _ if $state.get_op() == $x + 0b011111 => {
-                let $r1 = &mut $state.A; let $r2 = &$state.E; $y
-            },
-            _ if $state.get_op() == $x + 0b100000 => {
+            _ if $state.get_op() == $x + 0b000100 => {
                 let $r1 = &mut $state.B; let $r2 = &$state.H; $y
             },
-            _ if $state.get_op() == $x + 0b100001 => {
-                let $r1 = &mut $state.C; let $r2 = &$state.H; $y
-            },
-            _ if $state.get_op() == $x + 0b100010 => {
-                let $r1 = &mut $state.D; let $r2 = &$state.H; $y
-            },
-            _ if $state.get_op() == $x + 0b100011 => {
-                let $r1 = &mut $state.E; let $r2 = &$state.H; $y
-            },
-            _ if $state.get_op() == $x + 0b100101 => {
-                let $r1 = &mut $state.L; let $r2 = &$state.H; $y
-            },
-            _ if $state.get_op() == $x + 0b100111 => {
-                let $r1 = &mut $state.A; let $r2 = &$state.H; $y
-            },
-            _ if $state.get_op() == $x + 0b101000 => {
+            _ if $state.get_op() == $x + 0b000101 => {
                 let $r1 = &mut $state.B; let $r2 = &$state.L; $y
             },
-            _ if $state.get_op() == $x + 0b101001 => {
-                let $r1 = &mut $state.C; let $r2 = &$state.L; $y
-            },
-            _ if $state.get_op() == $x + 0b101010 => {
-                let $r1 = &mut $state.D; let $r2 = &$state.L; $y
-            },
-            _ if $state.get_op() == $x + 0b101011 => {
-                let $r1 = &mut $state.E; let $r2 = &$state.L; $y
-            },
-            _ if $state.get_op() == $x + 0b101100 => {
-                let $r1 = &mut $state.H; let $r2 = &$state.L; $y
-            },
-            _ if $state.get_op() == $x + 0b101111 => {
-                let $r1 = &mut $state.A; let $r2 = &$state.L; $y
-            },
-            _ if $state.get_op() == $x + 0b111000 => {
+            _ if $state.get_op() == $x + 0b000111 => {
                 let $r1 = &mut $state.B; let $r2 = &$state.A; $y
             },
-            _ if $state.get_op() == $x + 0b111001 => {
+            _ if $state.get_op() == $x + 0b001000 => {
+                let $r1 = &mut $state.C; let $r2 = &$state.B; $y
+            },
+            _ if $state.get_op() == $x + 0b001010 => {
+                let $r1 = &mut $state.C; let $r2 = &$state.D; $y
+            },
+            _ if $state.get_op() == $x + 0b001011 => {
+                let $r1 = &mut $state.C; let $r2 = &$state.E; $y
+            },
+            _ if $state.get_op() == $x + 0b001100 => {
+                let $r1 = &mut $state.C; let $r2 = &$state.H; $y
+            },
+            _ if $state.get_op() == $x + 0b001101 => {
+                let $r1 = &mut $state.C; let $r2 = &$state.L; $y
+            },
+            _ if $state.get_op() == $x + 0b001111 => {
                 let $r1 = &mut $state.C; let $r2 = &$state.A; $y
             },
-            _ if $state.get_op() == $x + 0b111010 => {
+            _ if $state.get_op() == $x + 0b010000 => {
+                let $r1 = &mut $state.D; let $r2 = &$state.B; $y
+            },
+            _ if $state.get_op() == $x + 0b010001 => {
+                let $r1 = &mut $state.D; let $r2 = &$state.C; $y
+            },
+            _ if $state.get_op() == $x + 0b010011 => {
+                let $r1 = &mut $state.D; let $r2 = &$state.E; $y
+            },
+            _ if $state.get_op() == $x + 0b010100 => {
+                let $r1 = &mut $state.D; let $r2 = &$state.H; $y
+            },
+            _ if $state.get_op() == $x + 0b010101 => {
+                let $r1 = &mut $state.D; let $r2 = &$state.L; $y
+            },
+            _ if $state.get_op() == $x + 0b010111 => {
                 let $r1 = &mut $state.D; let $r2 = &$state.A; $y
             },
-            _ if $state.get_op() == $x + 0b111011 => {
+            _ if $state.get_op() == $x + 0b011000 => {
+                let $r1 = &mut $state.E; let $r2 = &$state.B; $y
+            },
+            _ if $state.get_op() == $x + 0b011001 => {
+                let $r1 = &mut $state.E; let $r2 = &$state.C; $y
+            },
+            _ if $state.get_op() == $x + 0b011010 => {
+                let $r1 = &mut $state.E; let $r2 = &$state.D; $y
+            },
+            _ if $state.get_op() == $x + 0b011100 => {
+                let $r1 = &mut $state.E; let $r2 = &$state.H; $y
+            },
+            _ if $state.get_op() == $x + 0b011101 => {
+                let $r1 = &mut $state.E; let $r2 = &$state.L; $y
+            },
+            _ if $state.get_op() == $x + 0b011111 => {
                 let $r1 = &mut $state.E; let $r2 = &$state.A; $y
             },
-            _ if $state.get_op() == $x + 0b111100 => {
+            _ if $state.get_op() == $x + 0b100000 => {
+                let $r1 = &mut $state.H; let $r2 = &$state.B; $y
+            },
+            _ if $state.get_op() == $x + 0b100001 => {
+                let $r1 = &mut $state.H; let $r2 = &$state.C; $y
+            },
+            _ if $state.get_op() == $x + 0b100010 => {
+                let $r1 = &mut $state.H; let $r2 = &$state.D; $y
+            },
+            _ if $state.get_op() == $x + 0b100011 => {
+                let $r1 = &mut $state.H; let $r2 = &$state.E; $y
+            },
+            _ if $state.get_op() == $x + 0b100101 => {
+                let $r1 = &mut $state.H; let $r2 = &$state.L; $y
+            },
+            _ if $state.get_op() == $x + 0b100111 => {
                 let $r1 = &mut $state.H; let $r2 = &$state.A; $y
             },
-            _ if $state.get_op() == $x + 0b111101 => {
+            _ if $state.get_op() == $x + 0b101000 => {
+                let $r1 = &mut $state.L; let $r2 = &$state.B; $y
+            },
+            _ if $state.get_op() == $x + 0b101001 => {
+                let $r1 = &mut $state.L; let $r2 = &$state.C; $y
+            },
+            _ if $state.get_op() == $x + 0b101010 => {
+                let $r1 = &mut $state.L; let $r2 = &$state.D; $y
+            },
+            _ if $state.get_op() == $x + 0b101011 => {
+                let $r1 = &mut $state.L; let $r2 = &$state.E; $y
+            },
+            _ if $state.get_op() == $x + 0b101100 => {
+                let $r1 = &mut $state.L; let $r2 = &$state.H; $y
+            },
+            _ if $state.get_op() == $x + 0b101111 => {
                 let $r1 = &mut $state.L; let $r2 = &$state.A; $y
+            },
+            _ if $state.get_op() == $x + 0b111000 => {
+                let $r1 = &mut $state.A; let $r2 = &$state.B; $y
+            },
+            _ if $state.get_op() == $x + 0b111001 => {
+                let $r1 = &mut $state.A; let $r2 = &$state.C; $y
+            },
+            _ if $state.get_op() == $x + 0b111010 => {
+                let $r1 = &mut $state.A; let $r2 = &$state.D; $y
+            },
+            _ if $state.get_op() == $x + 0b111011 => {
+                let $r1 = &mut $state.A; let $r2 = &$state.E; $y
+            },
+            _ if $state.get_op() == $x + 0b111100 => {
+                let $r1 = &mut $state.A; let $r2 = &$state.H; $y
+            },
+            _ if $state.get_op() == $x + 0b111101 => {
+                let $r1 = &mut $state.A; let $r2 = &$state.L; $y
             },
         ))
     };
