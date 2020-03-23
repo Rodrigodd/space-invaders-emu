@@ -2,32 +2,34 @@
 #[repr(C)]
 #[allow(non_snake_case)]
 pub struct I8080State {
+    pub A: u8,
+    pub Flags: u8,
     pub B: u8,
     pub C: u8,
     pub D: u8,
     pub E: u8,
     pub H: u8,
     pub L: u8,
-    pub A: u8,
-    pub Flags: u8,
     SP: u16,
     PC: u16,
+    pub interrupt_enabled: bool,
     pub memory: [u8; 0x4000],
 }
 #[allow(non_snake_case)]
 impl I8080State {
     pub fn new() -> Self {
         I8080State {
+            A: 0,
+            Flags: 0b0000_0010,
             B: 0,
             C: 0,
             D: 0,
             E: 0,
             H: 0,
             L: 0,
-            A: 0,
-            Flags: 0,
             SP: 0,
             PC: 0,
+            interrupt_enabled: true,
 
             memory: [0; 0x4000],
         }
@@ -147,7 +149,7 @@ impl I8080State {
     }
 
     pub fn on_parity_even(&self) -> bool {
-        (self.Flags & 0b0000_0100) == 0
+        (self.Flags & 0b0000_0100) != 0
     }
 
     pub fn print_state<W: std::fmt::Write>(&self, w: &mut W) {

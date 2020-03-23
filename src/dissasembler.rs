@@ -50,7 +50,7 @@ pub fn dissasembly_around<W: Write>(w: &mut W, traced: &Vec<Range<u16>>, rom: &[
 }
 
 pub fn dissasembly<W: Write>(w: &mut W, rom: &[u8], entries: &[u16]) -> Result<(), fmt::Error> {
-    let mut pc = 0;
+    let mut pc = entries[0];
     let traced = trace(rom, entries);
 
     for Range {start, end} in traced {
@@ -121,7 +121,7 @@ pub fn trace(rom: &[u8], entries: &[u16]) -> Vec<Range<u16>> {
     }
 
     let mut pc = entries[0];
-    let mut read = vec![0..0];
+    let mut read = vec![pc..pc];
     let mut jumps = entries[1..].to_owned();
     let mut safety_counter = 0;
 
@@ -143,6 +143,7 @@ pub fn trace(rom: &[u8], entries: &[u16]) -> Vec<Range<u16>> {
         }
         if add_next_to_read(pc, offset & 0b11, &mut read) && offset < 8 {
             pc = pc + offset as u16;
+            pc = pc & 0x3fff;
         } else {
             while let Some(jmp) = jumps.pop() {
                 if !check_read(jmp, &read) {

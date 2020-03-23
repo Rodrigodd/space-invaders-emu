@@ -11,12 +11,15 @@ pub enum Message {
 }
 
 /// Start the interpreter in a new thread. Return a sender for communication.
+/// entries is a list of entries for the dissasembler. The first entry is the
+/// initial value of the Program Counter (PC).
 pub fn start(mut state: I8080State) -> Sender<Message> {
     use crate::dissasembler::dissasembly_around;
     use crate::write_adapter::WriteAdapter;
     use std::io;
     use std::fmt::Write;
 
+    #[derive(PartialEq)]
     enum State {
         Debugging,
         Running,
@@ -26,15 +29,19 @@ pub fn start(mut state: I8080State) -> Sender<Message> {
     let stdout = io::stdout();
     let mut interpreter_state = State::Debugging;
 
+    state.set_PC(0x0);
+
     let (send, recv) = channel();
 
     thread::spawn(move || loop {
-        let mut w = WriteAdapter(io::BufWriter::new(stdout.lock()));
-        writeln!(w).unwrap();
-        dissasembly_around(&mut w, &traced, &state.memory, state.get_PC()).unwrap();
-        writeln!(w).unwrap();
-        state.print_state(&mut w);
-        drop(w);
+        if interpreter_state == State::Debugging {
+            let mut w = WriteAdapter(io::BufWriter::new(stdout.lock()));
+            writeln!(w).unwrap();
+            dissasembly_around(&mut w, &traced, &state.memory, state.get_PC()).unwrap();
+            writeln!(w).unwrap();
+            state.print_state(&mut w);
+            drop(w);
+        }
 
         let of = interpret_opcode(&mut state);
         state.set_PC(state.get_PC() + of);
@@ -348,7 +355,7 @@ fn interpret_opcode(state: &mut I8080State) -> u16 {
             1
         },
         r 0b10001000 => { // ADC  r     | Add register to A with carry         | 10001SSS        |  4   
-            let (sum, carry) = state.A.overflowing_add(r + state.on_carry() as u8);
+            let (sum, carry) = state.A.overflowing_add(r.wrapping_add(state.on_carry() as u8));
             state.set_flags(sum, carry, (state.A & 0xf) + (r & 0xf) + state.on_carry() as u8 > 0xf);
             state.A = sum;
             1
@@ -360,8 +367,8 @@ fn interpret_opcode(state: &mut I8080State) -> u16 {
             1
         },
         r 0b10011000 => { // SBB  r     | Subtract register from A with borrow | 10011SSS        |  4   
-            let (sum, carry) = state.A.overflowing_sub(r.wrapping_add(1));
-            state.set_flags(sum, carry, (state.A & 0xf) + (-(r.wrapping_add(1) as i8) as u8 & 0xf) > 0xf);
+            let (sum, carry) = state.A.overflowing_sub(r.wrapping_add(state.on_carry() as u8));
+            state.set_flags(sum, carry, (state.A & 0xf) + (-(r.wrapping_add(state.on_carry() as u8) as i8) as u8 & 0xf) > 0xf);
             state.A = sum;
             1
         },
@@ -394,7 +401,7 @@ fn interpret_opcode(state: &mut I8080State) -> u16 {
         },
         0b10001110 => { // ADC  M     | Add memory to A with carry           | 10001110        |  7   
             let value = state.get_memory(state.get_HL());
-            let (sum, carry) = state.A.overflowing_add(value + state.on_carry() as u8);
+            let (sum, carry) = state.A.overflowing_add(value.wrapping_add(state.on_carry() as u8));
             state.set_flags(sum, carry, (state.A & 0xf) + (value & 0xf) + state.on_carry() as u8 > 0xf);
             state.A = sum;
             1
@@ -408,8 +415,8 @@ fn interpret_opcode(state: &mut I8080State) -> u16 {
         },
         0b10011110 => { // SBB  M     | Subtract memory from A with borrow   | 10011110        |  7   
             let value = state.get_memory(state.get_HL());
-            let (sum, carry) = state.A.overflowing_sub(value.wrapping_add(1));
-            state.set_flags(sum, carry, (state.A & 0xf) + (-(value.wrapping_add(1) as i8) as u8 & 0xf) > 0xf);
+            let (sum, carry) = state.A.overflowing_sub(value.wrapping_add(state.on_carry() as u8));
+            state.set_flags(sum, carry, (state.A & 0xf) + (-(value.wrapping_add(state.on_carry() as u8) as i8) as u8 & 0xf) > 0xf);
             state.A = sum;
             1
         },
@@ -446,7 +453,7 @@ fn interpret_opcode(state: &mut I8080State) -> u16 {
         },
         0b11001110 => { // ACI        | Add immediate to A with carry        | 11001110        |  7   
             let immediate = state.get_u8();
-            let (sum, carry) = state.A.overflowing_add(immediate + state.on_carry() as u8);
+            let (sum, carry) = state.A.overflowing_add(immediate.wrapping_add(state.on_carry() as u8));
             state.set_flags(sum, carry, (state.A & 0xf) + (immediate & 0xf) + state.on_carry() as u8 > 0xf);
             state.A = sum;
             2
@@ -460,8 +467,8 @@ fn interpret_opcode(state: &mut I8080State) -> u16 {
         },
         0b11011110 => { // SBI        | Subtract immediate from A with borrow| 11011110        |  7   
             let immediate = state.get_u8();
-            let (sum, carry) = state.A.overflowing_sub(immediate.wrapping_add(1));
-            state.set_flags(sum, carry, (state.A & 0xf) + (-(immediate.wrapping_add(1) as i8) as u8 & 0xf) > 0xf);
+            let (sum, carry) = state.A.overflowing_sub(immediate.wrapping_add(state.on_carry() as u8));
+            state.set_flags(sum, carry, (state.A & 0xf) + (-(immediate.wrapping_add(state.on_carry() as u8) as i8) as u8 & 0xf) > 0xf);
             state.A = sum;
             2
         },
@@ -491,23 +498,23 @@ fn interpret_opcode(state: &mut I8080State) -> u16 {
         },
         0b00000111 => { // RLC        | Rotate A left                        | 00000111        |  4   
             state.set_carry((state.A & 0b1000_0000) != 0);
-            state.A = state.A << 1;
+            state.A = state.A.rotate_left(1);
             1
         },
         0b00001111 => { // RRC        | Rotate A right                       | 00001111        |  4   
             state.set_carry((state.A & 0b0000_0001) != 0);
-            state.A = state.A >> 1;
+            state.A = state.A.rotate_right(1);
             1
         },
         0b00010111 => { // RAL        | Rotate A left through carry          | 00010111        |  4   
             let carry = (state.A & 0b1000_0000) != 0;
-            state.A = (state.A << 1) & state.on_carry() as u8;
+            state.A = (state.A << 1) | state.on_carry() as u8;
             state.set_carry(carry);
             1
         },
         0b00011111 => { // RAR        | Route A right through carry          | 00011111        |  4   
             let carry = (state.A & 0b0000_0001) != 0;
-            state.A = (state.A >> 1) & ((state.on_carry() as u8) << 7);
+            state.A = (state.A >> 1) | ((state.on_carry() as u8) << 7);
             state.set_carry(carry);
             1
         },
@@ -900,10 +907,10 @@ fn interpret_opcode(state: &mut I8080State) -> u16 {
             let mut carry = state.on_carry();
             let mut aux_carry = false;
             if state.A & 0xf > 9 || state.on_aux_carry() {
-                aux_carry = state.A & 0xf + 6 > 0xf;
+                aux_carry = (state.A & 0xf) + 6 > 0xf;
                 state.A += 6;
             }
-            if state.A & 0xf0 >> 4 > 9 || state.on_carry() {
+            if (state.A & 0xf0) >> 4 > 9 || state.on_carry() {
                 let (sum, c) = state.A.overflowing_add(6 << 4);
                 state.A = sum;
                 carry = carry || c;
@@ -924,11 +931,11 @@ fn interpret_opcode(state: &mut I8080State) -> u16 {
             3
         },
         0b11111011 => { // EI         | Enable Interrupts                    | 11111011        | 4    
-            println!("{:04x}  : op {:02x} is unimplemented", state.get_PC(), state.get_op());
+            state.interrupt_enabled = true;
             1
         },
         0b11110011 => { // DI         | Disable Interrupts                   | 11110011        | 4    
-            println!("{:04x}  : op {:02x} is unimplemented", state.get_PC(), state.get_op());
+            state.interrupt_enabled = false;
             1
         },
         0b00000000 => { // NOP        | No operation                         | 00000000        | 4    
