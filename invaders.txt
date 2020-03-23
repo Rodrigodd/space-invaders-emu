@@ -5,6 +5,233 @@
 
 ...
 
+0008 : f5    PUSH PSW   
+0009 : c5    PUSH B     
+000a : d5    PUSH D     
+000b : e5    PUSH H     
+000c : c3    JMP  008c
+
+...
+
+0010 : f5    PUSH PSW   
+0011 : c5    PUSH B     
+0012 : d5    PUSH D     
+0013 : e5    PUSH H     
+0014 : 3e    MVI  A 80
+0016 : 32    STA 2072
+0019 : 21    LXI  H 20c0
+001c : 35    DCR  M     
+001d : cd    CALL 17cd
+0020 : db    IN 01
+0022 : 0f    RRC        
+0023 : da    JC   0067
+0026 : 3a    LDA 20ea
+0029 : a7    ANA  A     
+002a : ca    JZ   0042
+002d : 3a    LDA 20eb
+0030 : fe    CPI 99
+0032 : ca    JZ   003e
+0035 : c6    ADI 01
+0037 : 27    DAA        
+0038 : 32    STA 20eb
+003b : cd    CALL 1947
+003e : af    XRA  A     
+003f : 32    STA 20ea
+0042 : 3a    LDA 20e9
+0045 : a7    ANA  A     
+0046 : ca    JZ   0082
+0049 : 3a    LDA 20ef
+004c : a7    ANA  A     
+004d : c2    JNZ  006f
+0050 : 3a    LDA 20eb
+0053 : a7    ANA  A     
+0054 : c2    JNZ  005d
+0057 : cd    CALL 0abf
+005a : c3    JMP  0082
+
+...
+
+005d : 3a    LDA 2093
+0060 : a7    ANA  A     
+0061 : c2    JNZ  0082
+0064 : c3    JMP  0765
+
+...
+
+0067 : 3e    MVI  A 01
+0069 : 32    STA 20ea
+006c : c3    JMP  003f
+
+...
+
+006f : cd    CALL 1740
+0072 : 3a    LDA 2032
+0075 : 32    STA 2080
+0078 : cd    CALL 0100
+007b : cd    CALL 0248
+007e : cd    CALL 0913
+0081 : 00    NOP        
+0082 : e1    POP  H     
+0083 : d1    POP  D     
+0084 : c1    POP  B     
+0085 : f1    POP  PSW   
+0086 : fb    EI         
+0087 : c9    RET        
+
+...
+
+008c : af    XRA  A     
+008d : 32    STA 2072
+0090 : 3a    LDA 20e9
+0093 : a7    ANA  A     
+0094 : ca    JZ   0082
+0097 : 3a    LDA 20ef
+009a : a7    ANA  A     
+009b : c2    JNZ  00a5
+009e : 3a    LDA 20c1
+00a1 : 0f    RRC        
+00a2 : d2    JNC  0082
+00a5 : 21    LXI  H 2020
+00a8 : cd    CALL 024b
+00ab : cd    CALL 0141
+00ae : c3    JMP  0082
+
+...
+
+00b1 : cd    CALL 0886
+00b4 : e5    PUSH H     
+00b5 : 7e    MOV  A, M  
+00b6 : 23    INX  H     
+00b7 : 66    MOV  H, M  
+00b8 : 6f    MOV  L, A
+00b9 : 22    SHLD  2009
+00bc : 22    SHLD  200b
+00bf : e1    POP  H     
+00c0 : 2b    DCX  H     
+00c1 : 7e    MOV  A, M  
+00c2 : fe    CPI 03
+00c4 : c2    JNZ  00c8
+00c7 : 3d    DCR  A     
+00c8 : 32    STA 2008
+00cb : fe    CPI fe
+00cd : 3e    MVI  A 00
+00cf : c2    JNZ  00d3
+00d2 : 3c    INR  A     
+00d3 : 32    STA 200d
+00d6 : c9    RET        
+
+...
+
+00d7 : 3e    MVI  A 02
+00d9 : 32    STA 21fb
+00dc : 32    STA 22fb
+00df : c3    JMP  08e4
+
+...
+
+0100 : 21    LXI  H 2002
+0103 : 7e    MOV  A, M  
+0104 : a7    ANA  A     
+0105 : c2    JNZ  1538
+0108 : e5    PUSH H     
+0109 : 3a    LDA 2006
+010c : 6f    MOV  L, A
+010d : 3a    LDA 2067
+0110 : 67    MOV  H, A
+0111 : 7e    MOV  A, M  
+0112 : a7    ANA  A     
+0113 : e1    POP  H     
+0114 : ca    JZ   0136
+0117 : 23    INX  H     
+0118 : 23    INX  H     
+0119 : 7e    MOV  A, M  
+011a : 23    INX  H     
+011b : 46    MOV  B, M  
+011c : e6    ANI fe
+011e : 07    RLC        
+011f : 07    RLC        
+0120 : 07    RLC        
+0121 : 5f    MOV  E, A
+0122 : 16    MVI  D 00
+0124 : 21    LXI  H 1c00
+0127 : 19    DAD  D     
+0128 : eb    XCHG       
+0129 : 78    MOV  A, B
+012a : a7    ANA  A     
+012b : c4    CNZ  013b
+012e : 2a    LHLD  200b
+0131 : 06    MVI  B 10
+0133 : cd    CALL 15d3
+0136 : af    XRA  A     
+0137 : 32    STA 2000
+013a : c9    RET        
+
+...
+
+0141 : 3a    LDA 2068
+0144 : a7    ANA  A     
+0145 : c8    RZ         
+0146 : 3a    LDA 2000
+0149 : a7    ANA  A     
+014a : c0    RNZ        
+014b : 3a    LDA 2067
+014e : 67    MOV  H, A
+014f : 3a    LDA 2006
+0152 : 16    MVI  D 02
+0154 : 3c    INR  A     
+0155 : fe    CPI 37
+0157 : cc    CZ   01a1
+015a : 6f    MOV  L, A
+015b : 46    MOV  B, M  
+015c : 05    DCR  B     
+015d : c2    JNZ  0154
+0160 : 32    STA 2006
+0163 : cd    CALL 017a
+0166 : 61    MOV  H, C
+0167 : 22    SHLD  200b
+016a : 7d    MOV  A, L
+016b : fe    CPI 28
+016d : da    JC   1971
+0170 : 7a    MOV  A, D
+0171 : 32    STA 2004
+0174 : 3e    MVI  A 01
+0176 : 32    STA 2000
+0179 : c9    RET        
+
+...
+
+017a : 16    MVI  D 00
+017c : 7d    MOV  A, L
+017d : 21    LXI  H 2009
+0180 : 46    MOV  B, M  
+0181 : 23    INX  H     
+0182 : 4e    MOV  C, M  
+0183 : fe    CPI 0b
+0185 : fa    JM   0194
+0188 : de    SBI 0b
+018a : 5f    MOV  E, A
+018b : 78    MOV  A, B
+018c : c6    ADI 10
+018e : 47    MOV  B, A
+018f : 7b    MOV  A, E
+0190 : 14    INR  D     
+0191 : c3    JMP  0183
+
+...
+
+0194 : 68    MOV  L, B
+0195 : a7    ANA  A     
+0196 : c8    RZ         
+0197 : 5f    MOV  E, A
+0198 : 79    MOV  A, C
+0199 : c6    ADI 10
+019b : 4f    MOV  C, A
+019c : 7b    MOV  A, E
+019d : 3d    DCR  A     
+019e : c3    JMP  0195
+
+...
+
 01c0 : 21    LXI  H 2100
 01c3 : 06    MVI  B 37
 01c5 : 36    MVI  M 01
@@ -22,6 +249,20 @@
 
 ...
 
+01d9 : 23    INX  H     
+01da : 46    MOV  B, M  
+01db : 23    INX  H     
+01dc : 79    MOV  A, C
+01dd : 86    ADD  M     
+01de : 77    MOV  M, A
+01df : 23    INX  H     
+01e0 : 78    MOV  A, B
+01e1 : 86    ADD  M     
+01e2 : 77    MOV  M, A
+01e3 : c9    RET        
+
+...
+
 01e4 : 06    MVI  B c0
 01e6 : 11    LXI  D 1b00
 01e9 : 21    LXI  H 2000
@@ -34,6 +275,7 @@
 
 ...
 
+01f5 : 21    LXI  H 2242
 01f8 : 0e    MVI  C 04
 01fa : 11    LXI  D 1d20
 01fd : d5    PUSH D     
@@ -43,6 +285,22 @@
 0204 : 0d    DCR  C     
 0205 : c2    JNZ  01fd
 0208 : c9    RET        
+
+...
+
+0209 : 3e    MVI  A 01
+020b : c3    JMP  021b
+
+...
+
+020e : 3e    MVI  A 01
+0210 : c3    JMP  0214
+
+...
+
+0213 : af    XRA  A     
+0214 : 11    LXI  D 2242
+0217 : c3    JMP  021e
 
 ...
 
@@ -75,10 +333,292 @@
 
 ...
 
+0248 : 21    LXI  H 2010
+024b : 7e    MOV  A, M  
+024c : fe    CPI ff
+024e : c8    RZ         
+024f : fe    CPI fe
+0251 : ca    JZ   0281
+0254 : 23    INX  H     
+0255 : 46    MOV  B, M  
+0256 : 4f    MOV  C, A
+0257 : b0    ORA  B     
+0258 : 79    MOV  A, C
+0259 : c2    JNZ  0277
+025c : 23    INX  H     
+025d : 7e    MOV  A, M  
+025e : a7    ANA  A     
+025f : c2    JNZ  0288
+0262 : 23    INX  H     
+0263 : 5e    MOV  E, M  
+0264 : 23    INX  H     
+0265 : 56    MOV  D, M  
+0266 : e5    PUSH H     
+0267 : eb    XCHG       
+0268 : e5    PUSH H     
+0269 : 21    LXI  H 026f
+026c : e3    XTHL       
+026d : d5    PUSH D     
+026e : e9    PCHL       
+026f : e1    POP  H     
+0270 : 11    LXI  D 000c
+0273 : 19    DAD  D     
+0274 : c3    JMP  024b
+
+...
+
+0277 : 05    DCR  B     
+0278 : 04    INR  B     
+0279 : c2    JNZ  027d
+027c : 3d    DCR  A     
+027d : 05    DCR  B     
+027e : 70    MOV  M, B
+027f : 2b    DCX  H     
+0280 : 77    MOV  M, A
+0281 : 11    LXI  D 0010
+0284 : 19    DAD  D     
+0285 : c3    JMP  024b
+
+...
+
+0288 : 35    DCR  M     
+0289 : 2b    DCX  H     
+028a : 2b    DCX  H     
+028b : c3    JMP  0281
+
+...
+
+02ed : 3a    LDA 2067
+02f0 : f5    PUSH PSW   
+02f1 : 0f    RRC        
+02f2 : da    JC   0332
+02f5 : cd    CALL 020e
+02f8 : cd    CALL 0878
+02fb : 73    MOV  M, E
+02fc : 23    INX  H     
+02fd : 72    MOV  M, D
+02fe : 2b    DCX  H     
+02ff : 2b    DCX  H     
+0300 : 70    MOV  M, B
+0301 : 00    NOP        
+0302 : cd    CALL 01e4
+0305 : f1    POP  PSW   
+0306 : 0f    RRC        
+0307 : 3e    MVI  A 21
+0309 : 06    MVI  B 00
+030b : d2    JNC  0312
+030e : 06    MVI  B 20
+0310 : 3e    MVI  A 22
+0312 : 32    STA 2067
+0315 : cd    CALL 0ab6
+0318 : af    XRA  A     
+0319 : 32    STA 2011
+031c : 78    MOV  A, B
+031d : d3    OUT 05
+031f : 3c    INR  A     
+0320 : 32    STA 2098
+0323 : cd    CALL 09d6
+0326 : cd    CALL 1a7f
+0329 : c3    JMP  07f9
+
+...
+
+0332 : cd    CALL 0209
+0335 : c3    JMP  02f8
+
+...
+
+0707 : 06    MVI  B fe
+0709 : c3    JMP  19dc
+
+...
+
+0765 : 3e    MVI  A 01
+0767 : 32    STA 2093
+076a : 31    LXI  SP 2400
+076d : fb    EI         
+076e : cd    CALL 1979
+0771 : cd    CALL 09d6
+0774 : 21    LXI  H 3013
+0777 : 11    LXI  D 1ff3
+077a : 0e    MVI  C 04
+077c : cd    CALL 08f3
+077f : 3a    LDA 20eb
+0782 : 3d    DCR  A     
+0783 : 21    LXI  H 2810
+0786 : 0e    MVI  C 14
+0788 : c2    JNZ  0857
+078b : 11    LXI  D 1acf
+078e : cd    CALL 08f3
+0791 : db    IN 01
+0793 : e6    ANI 04
+0795 : ca    JZ   077f
+0798 : 06    MVI  B 99
+079a : af    XRA  A     
+079b : 32    STA 20ce
+079e : 3a    LDA 20eb
+07a1 : 80    ADD  B     
+07a2 : 27    DAA        
+07a3 : 32    STA 20eb
+07a6 : cd    CALL 1947
+07a9 : 21    LXI  H 0000
+07ac : 22    SHLD  20f8
+07af : 22    SHLD  20fc
+07b2 : cd    CALL 1925
+07b5 : cd    CALL 192b
+07b8 : cd    CALL 19d7
+07bb : 21    LXI  H 0101
+07be : 7c    MOV  A, H
+07bf : 32    STA 20ef
+07c2 : 22    SHLD  20e7
+07c5 : 22    SHLD  20e5
+07c8 : cd    CALL 1956
+07cb : cd    CALL 01ef
+07ce : cd    CALL 01f5
+07d1 : cd    CALL 08d1
+07d4 : 32    STA 21ff
+07d7 : 32    STA 22ff
+07da : cd    CALL 00d7
+07dd : af    XRA  A     
+07de : 32    STA 21fe
+07e1 : 32    STA 22fe
+07e4 : cd    CALL 01c0
+07e7 : cd    CALL 1904
+07ea : 21    LXI  H 3878
+07ed : 22    SHLD  21fc
+07f0 : 22    SHLD  22fc
+07f3 : cd    CALL 01e4
+07f6 : cd    CALL 1a7f
+07f9 : cd    CALL 088d
+07fc : cd    CALL 09d6
+07ff : 00    NOP        
+0800 : af    XRA  A     
+0801 : 32    STA 20c1
+0804 : cd    CALL 01cf
+0807 : 3a    LDA 2067
+080a : 0f    RRC        
+080b : da    JC   0872
+080e : cd    CALL 0213
+0811 : cd    CALL 01cf
+0814 : cd    CALL 00b1
+0817 : cd    CALL 19d1
+081a : 06    MVI  B 20
+081c : cd    CALL 18fa
+081f : cd    CALL 1618
+0822 : cd    CALL 190a
+0825 : cd    CALL 15f3
+0828 : cd    CALL 0988
+082b : 3a    LDA 2082
+082e : a7    ANA  A     
+082f : ca    JZ   09ef
+0832 : cd    CALL 170e
+0835 : cd    CALL 0935
+0838 : cd    CALL 08d8
+083b : cd    CALL 172c
+083e : cd    CALL 0a59
+0841 : ca    JZ   0849
+0844 : 06    MVI  B 04
+0846 : cd    CALL 18fa
+0849 : cd    CALL 1775
+084c : d3    OUT 06
+084e : cd    CALL 1804
+0851 : c3    JMP  081f
+
+...
+
+0857 : 11    LXI  D 1aba
+085a : cd    CALL 08f3
+085d : 06    MVI  B 98
+085f : db    IN 01
+0861 : 0f    RRC        
+0862 : 0f    RRC        
+0863 : da    JC   086d
+0866 : 0f    RRC        
+0867 : da    JC   0798
+086a : c3    JMP  077f
+
+...
+
+086d : 3e    MVI  A 01
+086f : c3    JMP  079b
+
+...
+
+0872 : cd    CALL 021a
+0875 : c3    JMP  0814
+
+...
+
+0878 : 3a    LDA 2008
+087b : 47    MOV  B, A
+087c : 2a    LHLD  2009
+087f : eb    XCHG       
+0880 : c3    JMP  0886
+
+...
+
+0886 : 3a    LDA 2067
+0889 : 67    MOV  H, A
+088a : 2e    MVI  L fc
+088c : c9    RET        
+
+...
+
+088d : 21    LXI  H 2b11
+0890 : 11    LXI  D 1b70
+0893 : 0e    MVI  C 0e
+0895 : cd    CALL 08f3
+0898 : 3a    LDA 2067
+089b : 0f    RRC        
+089c : 3e    MVI  A 1c
+089e : 21    LXI  H 3711
+08a1 : d4    CNC  08ff
+08a4 : 3e    MVI  A b0
+08a6 : 32    STA 20c0
+08a9 : 3a    LDA 20c0
+08ac : a7    ANA  A     
+08ad : c8    RZ         
+08ae : e6    ANI 04
+08b0 : c2    JNZ  08bc
+08b3 : cd    CALL 09ca
+08b6 : cd    CALL 1931
+08b9 : c3    JMP  08a9
+
+...
+
+08bc : 06    MVI  B 20
+08be : 21    LXI  H 271c
+08c1 : 3a    LDA 2067
+08c4 : 0f    RRC        
+08c5 : da    JC   08cb
+08c8 : 21    LXI  H 391c
+08cb : cd    CALL 14cb
+08ce : c3    JMP  08a9
+
+...
+
 08d1 : db    IN 02
 08d3 : e6    ANI 03
 08d5 : c6    ADI 03
 08d7 : c9    RET        
+
+...
+
+08d8 : 3a    LDA 2082
+08db : fe    CPI 09
+08dd : d0    RNC        
+08de : 3e    MVI  A fb
+08e0 : 32    STA 207e
+08e3 : c9    RET        
+
+...
+
+08e4 : 3a    LDA 20ce
+08e7 : a7    ANA  A     
+08e8 : c0    RNZ        
+08e9 : 21    LXI  H 391c
+08ec : 06    MVI  B 20
+08ee : c3    JMP  14cb
 
 ...
 
@@ -96,7 +636,7 @@
 08ff : 11    LXI  D 1e00
 0902 : e5    PUSH H     
 0903 : 26    MVI  H 00
-0905 : 6f    MOV  A, L
+0905 : 6f    MOV  L, A
 0906 : 29    DAD  H     
 0907 : 29    DAD  H     
 0908 : 29    DAD  H     
@@ -109,10 +649,68 @@
 
 ...
 
+0913 : 3a    LDA 2009
+0916 : fe    CPI 78
+0918 : d0    RNC        
+0919 : 2a    LHLD  2091
+091c : 7d    MOV  A, L
+091d : b4    ORA  H     
+091e : c2    JNZ  0929
+0921 : 21    LXI  H 0600
+0924 : 3e    MVI  A 01
+0926 : 32    STA 2083
+0929 : 2b    DCX  H     
+092a : 22    SHLD  2091
+092d : c9    RET        
+
+...
+
 092e : cd    CALL 1611
 0931 : 2e    MVI  L ff
 0933 : 7e    MOV  A, M  
 0934 : c9    RET        
+
+...
+
+0935 : cd    CALL 1910
+0938 : 2b    DCX  H     
+0939 : 2b    DCX  H     
+093a : 7e    MOV  A, M  
+093b : a7    ANA  A     
+093c : c8    RZ         
+093d : 06    MVI  B 15
+093f : db    IN 02
+0941 : e6    ANI 08
+0943 : ca    JZ   0948
+0946 : 06    MVI  B 10
+0948 : cd    CALL 09ca
+094b : 23    INX  H     
+094c : 7e    MOV  A, M  
+094d : b8    CMP  B     
+094e : d8    RC         
+094f : cd    CALL 092e
+0952 : 34    INR  M     
+0953 : 7e    MOV  A, M  
+0954 : f5    PUSH PSW   
+0955 : 21    LXI  H 2501
+0958 : 24    INR  H     
+0959 : 24    INR  H     
+095a : 3d    DCR  A     
+095b : c2    JNZ  0958
+095e : 06    MVI  B 10
+0960 : 11    LXI  D 1c60
+0963 : cd    CALL 1439
+0966 : f1    POP  PSW   
+0967 : 3c    INR  A     
+0968 : cd    CALL 1a8b
+096b : cd    CALL 1910
+096e : 2b    DCX  H     
+096f : 2b    DCX  H     
+0970 : 36    MVI  M 00
+0972 : 3e    MVI  A ff
+0974 : 32    STA 2099
+0977 : 06    MVI  B 10
+0979 : c3    JMP  18fa
 
 ...
 
@@ -127,9 +725,39 @@
 
 ...
 
-09ad : 7a    MOV  D, A
+0988 : cd    CALL 09ca
+098b : 3a    LDA 20f1
+098e : a7    ANA  A     
+098f : c8    RZ         
+0990 : af    XRA  A     
+0991 : 32    STA 20f1
+0994 : e5    PUSH H     
+0995 : 2a    LHLD  20f2
+0998 : eb    XCHG       
+0999 : e1    POP  H     
+099a : 7e    MOV  A, M  
+099b : 83    ADD  E     
+099c : 27    DAA        
+099d : 77    MOV  M, A
+099e : 5f    MOV  E, A
+099f : 23    INX  H     
+09a0 : 7e    MOV  A, M  
+09a1 : 8a    ADC  D     
+09a2 : 27    DAA        
+09a3 : 77    MOV  M, A
+09a4 : 57    MOV  D, A
+09a5 : 23    INX  H     
+09a6 : 7e    MOV  A, M  
+09a7 : 23    INX  H     
+09a8 : 66    MOV  H, M  
+09a9 : 6f    MOV  L, A
+09aa : c3    JMP  09ad
+
+...
+
+09ad : 7a    MOV  A, D
 09ae : cd    CALL 09b2
-09b1 : 7b    MOV  E, A
+09b1 : 7b    MOV  A, E
 09b2 : d5    PUSH D     
 09b3 : f5    PUSH PSW   
 09b4 : 0f    RRC        
@@ -151,19 +779,87 @@
 
 ...
 
+09ca : 3a    LDA 2067
+09cd : 0f    RRC        
+09ce : 21    LXI  H 20f8
+09d1 : d8    RC         
+09d2 : 21    LXI  H 20fc
+09d5 : c9    RET        
+
+...
+
 09d6 : 21    LXI  H 2402
 09d9 : 36    MVI  M 00
 09db : 23    INX  H     
-09dc : 7d    MOV  L, A
+09dc : 7d    MOV  A, L
 09dd : e6    ANI 1f
 09df : fe    CPI 1c
 09e1 : da    JC   09e8
 09e4 : 11    LXI  D 0006
 09e7 : 19    DAD  D     
-09e8 : 7c    MOV  H, A
+09e8 : 7c    MOV  A, H
 09e9 : fe    CPI 40
 09eb : da    JC   09d9
 09ee : c9    RET        
+
+...
+
+09ef : cd    CALL 0a3c
+09f2 : af    XRA  A     
+09f3 : 32    STA 20e9
+09f6 : cd    CALL 09d6
+09f9 : 3a    LDA 2067
+09fc : f5    PUSH PSW   
+09fd : cd    CALL 01e4
+0a00 : f1    POP  PSW   
+0a01 : 32    STA 2067
+0a04 : 3a    LDA 2067
+0a07 : 67    MOV  H, A
+0a08 : e5    PUSH H     
+0a09 : 2e    MVI  L fe
+0a0b : 7e    MOV  A, M  
+0a0c : e6    ANI 07
+0a0e : 3c    INR  A     
+0a0f : 77    MOV  M, A
+0a10 : 21    LXI  H 1da2
+0a13 : 23    INX  H     
+0a14 : 3d    DCR  A     
+0a15 : c2    JNZ  0a13
+0a18 : 7e    MOV  A, M  
+0a19 : e1    POP  H     
+0a1a : 2e    MVI  L fc
+0a1c : 77    MOV  M, A
+0a1d : 23    INX  H     
+0a1e : 36    MVI  M 38
+0a20 : 7c    MOV  A, H
+0a21 : 0f    RRC        
+0a22 : da    JC   0a33
+0a25 : 3e    MVI  A 21
+0a27 : 32    STA 2098
+0a2a : cd    CALL 01f5
+0a2d : cd    CALL 1904
+0a30 : c3    JMP  0804
+
+...
+
+0a33 : cd    CALL 01ef
+0a36 : cd    CALL 01c0
+0a39 : c3    JMP  0804
+
+...
+
+0a3c : cd    CALL 0a59
+0a3f : c2    JNZ  0a52
+0a42 : 3e    MVI  A 30
+0a44 : 32    STA 20c0
+0a47 : 3a    LDA 20c0
+0a4a : a7    ANA  A     
+0a4b : c8    RZ         
+0a4c : cd    CALL 0a59
+0a4f : ca    JZ   0a47
+0a52 : cd    CALL 0a59
+0a55 : c2    JNZ  0a52
+0a58 : c9    RET        
 
 ...
 
@@ -176,11 +872,11 @@
 0a5f : 3a    LDA 20ef
 0a62 : a7    ANA  A     
 0a63 : ca    JZ   0a7c
-0a66 : 48    MOV  B, C
+0a66 : 48    MOV  C, B
 0a67 : 06    MVI  B 08
 0a69 : cd    CALL 18fa
-0a6c : 41    MOV  C, B
-0a6d : 78    MOV  B, A
+0a6c : 41    MOV  B, C
+0a6d : 78    MOV  A, B
 0a6e : cd    CALL 097c
 0a71 : 7e    MOV  A, M  
 0a72 : 21    LXI  H 20f3
@@ -222,6 +918,11 @@
 
 ...
 
+0aab : 21    LXI  H 2050
+0aae : c3    JMP  024b
+
+...
+
 0ab1 : 3e    MVI  A 40
 0ab3 : c3    JMP  0ad7
 
@@ -229,6 +930,22 @@
 
 0ab6 : 3e    MVI  A 80
 0ab8 : c3    JMP  0ad7
+
+...
+
+0abb : e1    POP  H     
+0abc : c3    JMP  0072
+
+...
+
+0abf : 3a    LDA 20c1
+0ac2 : 0f    RRC        
+0ac3 : da    JC   0abb
+0ac6 : 0f    RRC        
+0ac7 : da    JC   1868
+0aca : 0f    RRC        
+0acb : da    JC   0aab
+0ace : c9    RET        
 
 ...
 
@@ -362,6 +1079,24 @@
 
 ...
 
+1424 : cd    CALL 1474
+1427 : c5    PUSH B     
+1428 : e5    PUSH H     
+1429 : af    XRA  A     
+142a : 77    MOV  M, A
+142b : 23    INX  H     
+142c : 77    MOV  M, A
+142d : 23    INX  H     
+142e : e1    POP  H     
+142f : 01    LXI  B 0020
+1432 : 09    DAD  B     
+1433 : c1    POP  B     
+1434 : 05    DCR  B     
+1435 : c2    JNZ  1427
+1438 : c9    RET        
+
+...
+
 1439 : c5    PUSH B     
 143a : 1a    LDAX D     
 143b : 77    MOV  M, A
@@ -375,7 +1110,7 @@
 
 ...
 
-1474 : 7d    MOV  L, A
+1474 : 7d    MOV  A, L
 1475 : e6    ANI 07
 1477 : d3    OUT 02
 1479 : c3    JMP  1a47
@@ -419,25 +1154,25 @@
 14e0 : c0    RNZ        
 14e1 : 3a    LDA 2029
 14e4 : fe    CPI d8
-14e6 : 47    MOV  A, B
+14e6 : 47    MOV  B, A
 14e7 : d2    JNC  1530
 14ea : 3a    LDA 2002
 14ed : a7    ANA  A     
 14ee : c8    RZ         
-14ef : 78    MOV  B, A
+14ef : 78    MOV  A, B
 14f0 : fe    CPI ce
 14f2 : d2    JNC  1579
 14f5 : c6    ADI 06
-14f7 : 47    MOV  A, B
+14f7 : 47    MOV  B, A
 14f8 : 3a    LDA 2009
 14fb : fe    CPI 90
 14fd : d2    JNC  1504
 1500 : b8    CMP  B     
 1501 : d2    JNC  1530
-1504 : 68    MOV  B, L
+1504 : 68    MOV  L, B
 1505 : cd    CALL 1562
 1508 : 3a    LDA 202a
-150b : 67    MOV  A, H
+150b : 67    MOV  H, A
 150c : cd    CALL 156f
 150f : 22    SHLD  2064
 1512 : 3e    MVI  A 05
@@ -462,6 +1197,12 @@
 
 ...
 
+1538 : 21    LXI  H 2003
+153b : 35    DCR  M     
+153c : c0    RNZ        
+153d : 2a    LHLD  2064
+1540 : 06    MVI  B 10
+1542 : cd    CALL 1424
 1545 : 3e    MVI  A 04
 1547 : 32    STA 2025
 154a : af    XRA  A     
@@ -483,12 +1224,12 @@
 ...
 
 1562 : 3a    LDA 2009
-1565 : 65    MOV  L, H
+1565 : 65    MOV  H, L
 1566 : cd    CALL 1554
-1569 : 41    MOV  C, B
+1569 : 41    MOV  B, C
 156a : 05    DCR  B     
 156b : de    SBI 10
-156d : 6f    MOV  A, L
+156d : 6f    MOV  L, A
 156e : c9    RET        
 
 ...
@@ -496,7 +1237,7 @@
 156f : 3a    LDA 200a
 1572 : cd    CALL 1554
 1575 : de    SBI 10
-1577 : 67    MOV  A, H
+1577 : 67    MOV  H, A
 1578 : c9    RET        
 
 ...
@@ -507,7 +1248,7 @@
 
 ...
 
-1581 : 78    MOV  B, A
+1581 : 78    MOV  A, B
 1582 : 07    RLC        
 1583 : 07    RLC        
 1584 : 07    RLC        
@@ -516,9 +1257,9 @@
 1587 : 80    ADD  B     
 1588 : 81    ADD  C     
 1589 : 3d    DCR  A     
-158a : 6f    MOV  A, L
+158a : 6f    MOV  L, A
 158b : 3a    LDA 2067
-158e : 67    MOV  A, H
+158e : 67    MOV  H, A
 158f : c9    RET        
 
 ...
@@ -532,7 +1273,7 @@
 15a5 : 06    MVI  B fe
 15a7 : 3e    MVI  A 01
 15a9 : 32    STA 200d
-15ac : 78    MOV  B, A
+15ac : 78    MOV  A, B
 15ad : 32    STA 2008
 15b0 : 3a    LDA 200e
 15b3 : 32    STA 2007
@@ -585,9 +1326,28 @@
 
 ...
 
+15f3 : cd    CALL 1611
+15f6 : 01    LXI  B 3700
+15f9 : 7e    MOV  A, M  
+15fa : a7    ANA  A     
+15fb : ca    JZ   15ff
+15fe : 0c    INR  C     
+15ff : 23    INX  H     
+1600 : 05    DCR  B     
+1601 : c2    JNZ  15f9
+1604 : 79    MOV  A, C
+1605 : 32    STA 2082
+1608 : fe    CPI 01
+160a : c0    RNZ        
+160b : 21    LXI  H 206b
+160e : 36    MVI  M 01
+1610 : c9    RET        
+
+...
+
 1611 : 2e    MVI  L 00
 1613 : 3a    LDA 2067
-1616 : 67    MOV  A, H
+1616 : 67    MOV  H, A
 1617 : c9    RET        
 
 ...
@@ -632,7 +1392,7 @@
 1655 : 36    MVI  M 01
 1657 : 2a    LHLD  20ed
 165a : 23    INX  H     
-165b : 7d    MOV  L, A
+165b : 7d    MOV  A, L
 165c : fe    CPI 7e
 165e : da    JC   1663
 1661 : 2e    MVI  L 74
@@ -648,6 +1408,194 @@
 
 ...
 
+1671 : cd    CALL 1910
+1674 : 36    MVI  M 00
+1676 : cd    CALL 09ca
+1679 : 23    INX  H     
+167a : 11    LXI  D 20f5
+167d : 1a    LDAX D     
+167e : be    CMP  M     
+167f : 1b    DCX  D     
+1680 : 2b    DCX  H     
+1681 : 1a    LDAX D     
+1682 : ca    JZ   168b
+1685 : d2    JNC  1698
+1688 : c3    JMP  168f
+
+...
+
+168b : be    CMP  M     
+168c : d2    JNC  1698
+168f : 7e    MOV  A, M  
+1690 : 12    STAX D     
+1691 : 13    INX  D     
+1692 : 23    INX  H     
+1693 : 7e    MOV  A, M  
+1694 : 12    STAX D     
+1695 : cd    CALL 1950
+1698 : 3a    LDA 20ce
+169b : a7    ANA  A     
+169c : ca    JZ   16c9
+169f : 21    LXI  H 2803
+16a2 : 11    LXI  D 1aa6
+16a5 : 0e    MVI  C 14
+16a7 : cd    CALL 0a93
+16aa : 25    DCR  H     
+16ab : 25    DCR  H     
+16ac : 06    MVI  B 1b
+16ae : 3a    LDA 2067
+16b1 : 0f    RRC        
+16b2 : da    JC   16b7
+16b5 : 06    MVI  B 1c
+16b7 : 78    MOV  A, B
+16b8 : cd    CALL 08ff
+16bb : cd    CALL 0ab1
+16be : cd    CALL 18e7
+16c1 : 7e    MOV  A, M  
+16c2 : a7    ANA  A     
+16c3 : ca    JZ   16c9
+16c6 : c3    JMP  02ed
+
+...
+
+16c9 : 21    LXI  H 2d18
+16cc : 11    LXI  D 1aa6
+16cf : 0e    MVI  C 0a
+16d1 : cd    CALL 0a93
+16d4 : cd    CALL 0ab6
+16d7 : cd    CALL 09d6
+16da : af    XRA  A     
+16db : 32    STA 20ef
+16de : d3    OUT 05
+16e0 : cd    CALL 19d1
+16e3 : c3    JMP  0b89
+
+...
+
+16e6 : 31    LXI  SP 2400
+16e9 : fb    EI         
+16ea : af    XRA  A     
+16eb : 32    STA 2015
+16ee : cd    CALL 14d8
+16f1 : 06    MVI  B 04
+16f3 : cd    CALL 18fa
+16f6 : cd    CALL 0a59
+16f9 : c2    JNZ  16ee
+16fc : cd    CALL 19d7
+16ff : 21    LXI  H 2701
+1702 : cd    CALL 19fa
+1705 : af    XRA  A     
+1706 : cd    CALL 1a8b
+1709 : 06    MVI  B fb
+170b : c3    JMP  196b
+
+...
+
+170e : cd    CALL 09ca
+1711 : 23    INX  H     
+1712 : 7e    MOV  A, M  
+1713 : 11    LXI  D 1cb8
+1716 : 21    LXI  H 1aa1
+1719 : 0e    MVI  C 04
+171b : 47    MOV  B, A
+171c : 1a    LDAX D     
+171d : b8    CMP  B     
+171e : d2    JNC  1727
+1721 : 23    INX  H     
+1722 : 13    INX  D     
+1723 : 0d    DCR  C     
+1724 : c2    JNZ  171c
+1727 : 7e    MOV  A, M  
+1728 : 32    STA 20cf
+172b : c9    RET        
+
+...
+
+172c : 3a    LDA 2025
+172f : fe    CPI 00
+1731 : c2    JNZ  1739
+1734 : 06    MVI  B fd
+1736 : c3    JMP  19dc
+
+...
+
+1739 : 06    MVI  B 02
+173b : c3    JMP  18fa
+
+...
+
+1740 : 21    LXI  H 209b
+1743 : 35    DCR  M     
+1744 : cc    CZ   176d
+1747 : 3a    LDA 2068
+174a : a7    ANA  A     
+174b : ca    JZ   176d
+174e : 21    LXI  H 2096
+1751 : 35    DCR  M     
+1752 : c0    RNZ        
+1753 : 21    LXI  H 2098
+1756 : 7e    MOV  A, M  
+1757 : d3    OUT 05
+1759 : 3a    LDA 2082
+175c : a7    ANA  A     
+175d : ca    JZ   176d
+1760 : 2b    DCX  H     
+1761 : 7e    MOV  A, M  
+1762 : 2b    DCX  H     
+1763 : 77    MOV  M, A
+1764 : 2b    DCX  H     
+1765 : 36    MVI  M 01
+1767 : 3e    MVI  A 04
+1769 : 32    STA 209b
+176c : c9    RET        
+
+...
+
+176d : 3a    LDA 2098
+1770 : e6    ANI 30
+1772 : d3    OUT 05
+1774 : c9    RET        
+
+...
+
+1775 : 3a    LDA 2095
+1778 : a7    ANA  A     
+1779 : ca    JZ   17aa
+177c : 21    LXI  H 1a11
+177f : 11    LXI  D 1a21
+1782 : 3a    LDA 2082
+1785 : be    CMP  M     
+1786 : d2    JNC  178e
+1789 : 23    INX  H     
+178a : 13    INX  D     
+178b : c3    JMP  1785
+
+...
+
+178e : 1a    LDAX D     
+178f : 32    STA 2097
+1792 : 21    LXI  H 2098
+1795 : 7e    MOV  A, M  
+1796 : e6    ANI 30
+1798 : 47    MOV  B, A
+1799 : 7e    MOV  A, M  
+179a : e6    ANI 0f
+179c : 07    RLC        
+179d : fe    CPI 10
+179f : c2    JNZ  17a4
+17a2 : 3e    MVI  A 01
+17a4 : b0    ORA  B     
+17a5 : 77    MOV  M, A
+17a6 : af    XRA  A     
+17a7 : 32    STA 2095
+17aa : 21    LXI  H 2099
+17ad : 35    DCR  M     
+17ae : c0    RNZ        
+17af : 06    MVI  B ef
+17b1 : c3    JMP  19dc
+
+...
+
 17c0 : 3a    LDA 2067
 17c3 : 0f    RRC        
 17c4 : d2    JNC  17ca
@@ -658,6 +1606,46 @@
 
 17ca : db    IN 02
 17cc : c9    RET        
+
+...
+
+17cd : db    IN 02
+17cf : e6    ANI 04
+17d1 : c8    RZ         
+17d2 : 3a    LDA 209a
+17d5 : a7    ANA  A     
+17d6 : c0    RNZ        
+17d7 : 31    LXI  SP 2400
+17da : 06    MVI  B 04
+17dc : cd    CALL 09d6
+17df : 05    DCR  B     
+17e0 : c2    JNZ  17dc
+17e3 : 3e    MVI  A 01
+17e5 : 32    STA 209a
+17e8 : cd    CALL 19d7
+17eb : fb    EI         
+17ec : 11    LXI  D 1cbc
+17ef : 21    LXI  H 3016
+17f2 : 0e    MVI  C 04
+17f4 : cd    CALL 0a93
+17f7 : cd    CALL 0ab1
+17fa : af    XRA  A     
+17fb : 32    STA 209a
+17fe : 32    STA 2093
+1801 : c3    JMP  16c9
+
+...
+
+1804 : 21    LXI  H 2084
+1807 : 7e    MOV  A, M  
+1808 : a7    ANA  A     
+1809 : ca    JZ   0707
+180c : 23    INX  H     
+180d : 7e    MOV  A, M  
+180e : a7    ANA  A     
+180f : c0    RNZ        
+1810 : 06    MVI  B 01
+1812 : c3    JMP  18fa
 
 ...
 
@@ -693,7 +1681,7 @@
 
 184c : c5    PUSH B     
 184d : 3a    LDA 206c
-1850 : 4f    MOV  A, C
+1850 : 4f    MOV  C, A
 1851 : cd    CALL 0a93
 1854 : c1    POP  B     
 1855 : c9    RET        
@@ -704,19 +1692,48 @@
 1857 : fe    CPI ff
 1859 : 37    STC        
 185a : c8    RZ         
-185b : 6f    MOV  A, L
+185b : 6f    MOV  L, A
 185c : 03    INX  B     
 185d : 0a    LDAX B     
-185e : 67    MOV  A, H
+185e : 67    MOV  H, A
 185f : 03    INX  B     
 1860 : 0a    LDAX B     
-1861 : 5f    MOV  A, E
+1861 : 5f    MOV  E, A
 1862 : 03    INX  B     
 1863 : 0a    LDAX B     
-1864 : 57    MOV  A, D
+1864 : 57    MOV  D, A
 1865 : 03    INX  B     
 1866 : a7    ANA  A     
 1867 : c9    RET        
+
+...
+
+1868 : 21    LXI  H 20c2
+186b : 34    INR  M     
+186c : 23    INX  H     
+186d : 4e    MOV  C, M  
+186e : cd    CALL 01d9
+1871 : 47    MOV  B, A
+1872 : 3a    LDA 20ca
+1875 : b8    CMP  B     
+1876 : ca    JZ   1898
+1879 : 3a    LDA 20c2
+187c : e6    ANI 04
+187e : 2a    LHLD  20cc
+1881 : c2    JNZ  1888
+1884 : 11    LXI  D 0030
+1887 : 19    DAD  D     
+1888 : 22    SHLD  20c7
+188b : 21    LXI  H 20c5
+188e : cd    CALL 1a3b
+1891 : eb    XCHG       
+1892 : c3    JMP  15d3
+
+...
+
+1898 : 3e    MVI  A 01
+189a : 32    STA 20cb
+189d : c9    RET        
 
 ...
 
@@ -754,6 +1771,15 @@
 
 ...
 
+18e7 : 3a    LDA 2067
+18ea : 21    LXI  H 20e7
+18ed : 0f    RRC        
+18ee : d0    RNC        
+18ef : 23    INX  H     
+18f0 : c9    RET        
+
+...
+
 18f1 : 06    MVI  B 02
 18f3 : 3a    LDA 2082
 18f6 : 3d    DCR  A     
@@ -771,8 +1797,22 @@
 
 ...
 
+1904 : 21    LXI  H 2200
+1907 : c3    JMP  01c3
+
+...
+
 190a : cd    CALL 14d8
 190d : c3    JMP  1597
+
+...
+
+1910 : 21    LXI  H 20e7
+1913 : 3a    LDA 2067
+1916 : 0f    RRC        
+1917 : d8    RC         
+1918 : 23    INX  H     
+1919 : c9    RET        
 
 ...
 
@@ -800,7 +1840,7 @@
 1935 : 7e    MOV  A, M  
 1936 : 23    INX  H     
 1937 : 66    MOV  H, M  
-1938 : 6f    MOV  A, L
+1938 : 6f    MOV  L, A
 1939 : c3    JMP  09ad
 
 ...
@@ -833,6 +1873,23 @@
 
 ...
 
+196b : cd    CALL 19dc
+196e : c3    JMP  1671
+
+...
+
+1971 : 3e    MVI  A 01
+1973 : 32    STA 206d
+1976 : c3    JMP  16e6
+
+...
+
+1979 : cd    CALL 19d7
+197c : cd    CALL 1947
+197f : c3    JMP  193c
+
+...
+
 1982 : 32    STA 20c1
 1985 : c9    RET        
 
@@ -862,6 +1919,17 @@
 
 ...
 
+19d1 : 3e    MVI  A 01
+19d3 : 32    STA 20e9
+19d6 : c9    RET        
+
+...
+
+19d7 : af    XRA  A     
+19d8 : c3    JMP  19d3
+
+...
+
 19dc : 3a    LDA 2094
 19df : a0    ANA  B     
 19e0 : 32    STA 2094
@@ -874,14 +1942,14 @@
 19e9 : ca    JZ   19fa
 19ec : 11    LXI  D 1c60
 19ef : 06    MVI  B 10
-19f1 : 4f    MOV  A, C
+19f1 : 4f    MOV  C, A
 19f2 : cd    CALL 1439
-19f5 : 79    MOV  C, A
+19f5 : 79    MOV  A, C
 19f6 : 3d    DCR  A     
 19f7 : c2    JNZ  19ec
 19fa : 06    MVI  B 10
 19fc : cd    CALL 14cb
-19ff : 7c    MOV  H, A
+19ff : 7c    MOV  A, H
 1a00 : fe    CPI 35
 1a02 : c2    JNZ  19fa
 1a05 : c9    RET        
@@ -907,26 +1975,26 @@
 1a41 : 4e    MOV  C, M  
 1a42 : 23    INX  H     
 1a43 : 46    MOV  B, M  
-1a44 : 61    MOV  C, H
-1a45 : 6f    MOV  A, L
+1a44 : 61    MOV  H, C
+1a45 : 6f    MOV  L, A
 1a46 : c9    RET        
 
 ...
 
 1a47 : c5    PUSH B     
 1a48 : 06    MVI  B 03
-1a4a : 7c    MOV  H, A
+1a4a : 7c    MOV  A, H
 1a4b : 1f    RAR        
-1a4c : 67    MOV  A, H
-1a4d : 7d    MOV  L, A
+1a4c : 67    MOV  H, A
+1a4d : 7d    MOV  A, L
 1a4e : 1f    RAR        
-1a4f : 6f    MOV  A, L
+1a4f : 6f    MOV  L, A
 1a50 : 05    DCR  B     
 1a51 : c2    JNZ  1a4a
-1a54 : 7c    MOV  H, A
+1a54 : 7c    MOV  A, H
 1a55 : e6    ANI 3f
 1a57 : f6    ORI 20
-1a59 : 67    MOV  A, H
+1a59 : 67    MOV  H, A
 1a5a : c1    POP  B     
 1a5b : c9    RET        
 
@@ -935,7 +2003,7 @@
 1a5c : 21    LXI  H 2400
 1a5f : 36    MVI  M 00
 1a61 : 23    INX  H     
-1a62 : 7c    MOV  H, A
+1a62 : 7c    MOV  A, H
 1a63 : fe    CPI 40
 1a65 : c2    JNZ  1a5f
 1a68 : c9    RET        
@@ -945,7 +2013,9 @@
 1a69 : c5    PUSH B     
 1a6a : e5    PUSH H     
 1a6b : 1a    LDAX D     
-1a6c : b6    ORA  1377     
+1a6c : b6    ORA  M     
+1a6d : 77    MOV  M, A
+1a6e : 13    INX  D     
 1a6f : 23    INX  H     
 1a70 : 0d    DCR  C     
 1a71 : c2    JNZ  1a6b

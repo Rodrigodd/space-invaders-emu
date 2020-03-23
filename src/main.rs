@@ -27,7 +27,7 @@ fn main() {
     let _ = args.next();
     if args.any(|arg| arg.starts_with("-d")) {
         let mut stdout = WriteAdapter(io::stdout());
-        dissasembly(&mut stdout, &state.memory).unwrap();
+        dissasembly(&mut stdout, &state.memory, &[0x0u16, 0x8, 0x10]).unwrap();
     } else {
         main_loop(state);
     }

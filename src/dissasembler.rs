@@ -49,9 +49,9 @@ pub fn dissasembly_around<W: Write>(w: &mut W, traced: &Vec<Range<u16>>, rom: &[
     Ok(())
 }
 
-pub fn dissasembly<W: Write>(w: &mut W, rom: &[u8]) -> Result<(), fmt::Error> {
+pub fn dissasembly<W: Write>(w: &mut W, rom: &[u8], entries: &[u16]) -> Result<(), fmt::Error> {
     let mut pc = 0;
-    let traced = trace(rom);
+    let traced = trace(rom, entries);
 
     for Range {start, end} in traced {
         if pc != 0 {
@@ -75,7 +75,7 @@ pub fn dissasembly<W: Write>(w: &mut W, rom: &[u8]) -> Result<(), fmt::Error> {
 
 }
 
-pub fn trace(rom: &[u8]) -> Vec<Range<u16>> {
+pub fn trace(rom: &[u8], entries: &[u16]) -> Vec<Range<u16>> {
     fn add_next_to_read(pc: u16, offset: u8, read: &mut Vec<Range<u16>>) -> bool {
         match read.binary_search_by_key(&pc, |r: &Range<u16>| r.end) {
             Ok(i) =>  {
@@ -120,9 +120,9 @@ pub fn trace(rom: &[u8]) -> Vec<Range<u16>> {
         // read[i-1].contains(&pc) || (i < read.len() && read[i].start == pc)
     }
 
-    let mut pc = 0u16;
+    let mut pc = entries[0];
     let mut read = vec![0..0];
-    let mut jumps = Vec::new();
+    let mut jumps = entries[1..].to_owned();
     let mut safety_counter = 0;
 
     'd: loop {

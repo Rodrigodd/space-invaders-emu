@@ -22,7 +22,7 @@ pub fn start(mut state: I8080State) -> Sender<Message> {
         Running,
     }
 
-    let traced = dissasembler::trace(&state.memory);
+    let traced = dissasembler::trace(&state.memory, &[0x0u16, 0x8, 0x10]);
     let stdout = io::stdout();
     let mut interpreter_state = State::Debugging;
 
