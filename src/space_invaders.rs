@@ -14,7 +14,7 @@ use winit::{
 };
 use pixels::{Pixels, SurfaceTexture};
 
-const SCREEN_WIDTH: u32 = 512;
+const SCREEN_WIDTH: u32 = 224;
 const SCREEN_HEIGHT: u32 = 256;
 
 struct SpaceInvadersDevices {
@@ -111,9 +111,9 @@ fn render_screen(screen: &mut [u8], memory: &[AtomicU8]) {
             let m = memory[i/8].load(Ordering::Relaxed);
             let c = if (m >> (i%8)) & 0x1 != 0 { 0xff } else { 0x0 };
             let p = ((SCREEN_HEIGHT - y - 1)*SCREEN_WIDTH + x) as usize*4;
-            screen[p]     = c;
-            screen[p + 1] = c;
-            screen[p + 2] = c;
+            screen[p]     = if y >= 72 || (y < 16 && (x < 16 || x >= 102))                         { c } else { 0 };
+            screen[p + 1] = if y < 192 || y >= 224                                                 { c } else { 0 };
+            screen[p + 2] = if (y >= 72 && y < 192) || y>= 224 || (y < 16 && (x < 16 || x >= 102)) { c } else { 0 };
             screen[p + 3] = 0xff;
         }
     }
@@ -161,7 +161,7 @@ pub fn main_loop(debug: bool) {
 
         match event {
             Event::RedrawRequested(window_id) if window_id == window.id() => {
-                render_screen(pixels.get_frame(), &(*memory));
+                render_screen(pixels.get_frame(), &memory[0x2400..]);
                 pixels.render();
                 interpreter_io.interrupt(0b11010111); // RST 2 (0xd7)
                 thread::sleep(Duration::from_millis(8));
