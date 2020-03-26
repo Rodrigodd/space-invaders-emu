@@ -441,7 +441,7 @@ macro_rules! ops {
 
 
 // write the dissasembly of the opcode, return the next offset
-fn dissasembly_opcode<W: Write>(w: &mut W, pc: u16, rom: &[u8]) -> Result<u8, fmt::Error> {
+pub fn dissasembly_opcode<W: Write>(w: &mut W, pc: u16, rom: &[u8]) -> Result<u8, fmt::Error> {
     Ok(ops!{ rom; pc;
         r1 r2 | 0b01000000 => { // MOV  r1, r2| Move register to register            | 01DDDSSS        |  5   
             writeln!(w, "MOV  {}, {}", r1, r2)?; 1

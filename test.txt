@@ -1,966 +1,703 @@
+0000 : c3    JMP  00a8
 
 ...
 
-0000 : 00    NOP        
-0001 : 00    NOP        
-0002 : 00    NOP        
-0003 : 00    NOP        
-0004 : 00    NOP        
-0005 : 00    NOP        
-0006 : 00    NOP        
-0007 : 00    NOP        
-0008 : 00    NOP        
-0009 : 00    NOP        
-000a : 00    NOP        
-000b : 00    NOP        
-000c : 00    NOP        
-000d : 00    NOP        
-000e : 00    NOP        
-000f : 00    NOP        
-0010 : 00    NOP        
-0011 : 00    NOP        
-0012 : 00    NOP        
-0013 : 00    NOP        
-0014 : 00    NOP        
-0015 : 00    NOP        
-0016 : 00    NOP        
-0017 : 00    NOP        
-0018 : 00    NOP        
-0019 : 00    NOP        
-001a : 00    NOP        
-001b : 00    NOP        
-001c : 00    NOP        
-001d : 00    NOP        
-001e : 00    NOP        
-001f : 00    NOP        
-0020 : 00    NOP        
-0021 : 00    NOP        
-0022 : 00    NOP        
-0023 : 00    NOP        
-0024 : 00    NOP        
-0025 : 00    NOP        
-0026 : 00    NOP        
-0027 : 00    NOP        
-0028 : 00    NOP        
-0029 : 00    NOP        
-002a : 00    NOP        
-002b : 00    NOP        
-002c : 00    NOP        
-002d : 00    NOP        
-002e : 00    NOP        
-002f : 00    NOP        
-0030 : 00    NOP        
-0031 : 00    NOP        
-0032 : 00    NOP        
-0033 : 00    NOP        
-0034 : 00    NOP        
-0035 : 00    NOP        
-0036 : 00    NOP        
-0037 : 00    NOP        
-0038 : 00    NOP        
-0039 : 00    NOP        
-003a : 00    NOP        
-003b : 00    NOP        
-003c : 00    NOP        
-003d : 00    NOP        
-003e : 00    NOP        
-003f : 00    NOP        
-0040 : 00    NOP        
-0041 : 00    NOP        
-0042 : 00    NOP        
-0043 : 00    NOP        
-0044 : 00    NOP        
-0045 : 00    NOP        
-0046 : 00    NOP        
-0047 : 00    NOP        
-0048 : 00    NOP        
-0049 : 00    NOP        
-004a : 00    NOP        
-004b : 00    NOP        
-004c : 00    NOP        
-004d : 00    NOP        
-004e : 00    NOP        
-004f : 00    NOP        
-0050 : 00    NOP        
-0051 : 00    NOP        
-0052 : 00    NOP        
-0053 : 00    NOP        
-0054 : 00    NOP        
-0055 : 00    NOP        
-0056 : 00    NOP        
-0057 : 00    NOP        
-0058 : 00    NOP        
-0059 : 00    NOP        
-005a : 00    NOP        
-005b : 00    NOP        
-005c : 00    NOP        
-005d : 00    NOP        
-005e : 00    NOP        
-005f : 00    NOP        
-0060 : 00    NOP        
-0061 : 00    NOP        
-0062 : 00    NOP        
-0063 : 00    NOP        
-0064 : 00    NOP        
-0065 : 00    NOP        
-0066 : 00    NOP        
-0067 : 00    NOP        
-0068 : 00    NOP        
-0069 : 00    NOP        
-006a : 00    NOP        
-006b : 00    NOP        
-006c : 00    NOP        
-006d : 00    NOP        
-006e : 00    NOP        
-006f : 00    NOP        
-0070 : 00    NOP        
-0071 : 00    NOP        
-0072 : 00    NOP        
-0073 : 00    NOP        
-0074 : 00    NOP        
-0075 : 00    NOP        
-0076 : 00    NOP        
-0077 : 00    NOP        
-0078 : 00    NOP        
-0079 : 00    NOP        
-007a : 00    NOP        
-007b : 00    NOP        
-007c : 00    NOP        
-007d : 00    NOP        
-007e : 00    NOP        
-007f : 00    NOP        
-0080 : 00    NOP        
-0081 : 00    NOP        
-0082 : 00    NOP        
-0083 : 00    NOP        
-0084 : 00    NOP        
-0085 : 00    NOP        
-0086 : 00    NOP        
-0087 : 00    NOP        
-0088 : 00    NOP        
-0089 : 00    NOP        
-008a : 00    NOP        
-008b : 00    NOP        
-008c : 00    NOP        
-008d : 00    NOP        
-008e : 00    NOP        
-008f : 00    NOP        
-0090 : 00    NOP        
-0091 : 00    NOP        
-0092 : 00    NOP        
-0093 : 00    NOP        
-0094 : 00    NOP        
-0095 : 00    NOP        
-0096 : 00    NOP        
-0097 : 00    NOP        
-0098 : 00    NOP        
-0099 : 00    NOP        
-009a : 00    NOP        
-009b : 00    NOP        
-009c : 00    NOP        
-009d : 00    NOP        
-009e : 00    NOP        
-009f : 00    NOP        
-00a0 : 00    NOP        
-00a1 : 00    NOP        
-00a2 : 00    NOP        
-00a3 : 00    NOP        
-00a4 : 00    NOP        
-00a5 : 00    NOP        
-00a6 : 00    NOP        
-00a7 : 00    NOP        
-00a8 : 00    NOP        
-00a9 : 00    NOP        
-00aa : 00    NOP        
-00ab : 00    NOP        
-00ac : 00    NOP        
-00ad : 00    NOP        
-00ae : 00    NOP        
-00af : 00    NOP        
-00b0 : 00    NOP        
-00b1 : 00    NOP        
-00b2 : 00    NOP        
-00b3 : 00    NOP        
-00b4 : 00    NOP        
-00b5 : 00    NOP        
-00b6 : 00    NOP        
-00b7 : 00    NOP        
-00b8 : 00    NOP        
-00b9 : 00    NOP        
-00ba : 00    NOP        
-00bb : 00    NOP        
-00bc : 00    NOP        
-00bd : 00    NOP        
-00be : 00    NOP        
-00bf : 00    NOP        
-00c0 : 00    NOP        
-00c1 : 00    NOP        
-00c2 : 00    NOP        
-00c3 : 00    NOP        
-00c4 : 00    NOP        
-00c5 : 00    NOP        
-00c6 : 00    NOP        
-00c7 : 00    NOP        
-00c8 : 00    NOP        
-00c9 : 00    NOP        
-00ca : 00    NOP        
-00cb : 00    NOP        
-00cc : 00    NOP        
-00cd : 00    NOP        
-00ce : 00    NOP        
-00cf : 00    NOP        
-00d0 : 00    NOP        
-00d1 : 00    NOP        
-00d2 : 00    NOP        
-00d3 : 00    NOP        
-00d4 : 00    NOP        
-00d5 : 00    NOP        
-00d6 : 00    NOP        
-00d7 : 00    NOP        
-00d8 : 00    NOP        
-00d9 : 00    NOP        
-00da : 00    NOP        
-00db : 00    NOP        
-00dc : 00    NOP        
-00dd : 00    NOP        
-00de : 00    NOP        
-00df : 00    NOP        
-00e0 : 00    NOP        
-00e1 : 00    NOP        
-00e2 : 00    NOP        
-00e3 : 00    NOP        
-00e4 : 00    NOP        
-00e5 : 00    NOP        
-00e6 : 00    NOP        
-00e7 : 00    NOP        
-00e8 : 00    NOP        
-00e9 : 00    NOP        
-00ea : 00    NOP        
-00eb : 00    NOP        
-00ec : 00    NOP        
-00ed : 00    NOP        
-00ee : 00    NOP        
-00ef : 00    NOP        
-00f0 : 00    NOP        
-00f1 : 00    NOP        
-00f2 : 00    NOP        
-00f3 : 00    NOP        
-00f4 : 00    NOP        
-00f5 : 00    NOP        
-00f6 : 00    NOP        
-00f7 : 00    NOP        
-00f8 : 00    NOP        
-00f9 : 00    NOP        
-00fa : 00    NOP        
-00fb : 00    NOP        
-00fc : 00    NOP        
-00fd : 00    NOP        
-00fe : 00    NOP        
-00ff : 00    NOP        
-0100 : c3    JMP  01ab
+004e : d3    OUT 02
+0050 : c9    RET        
 
 ...
 
-0145 : d5    PUSH D     
-0146 : eb    XCHG       
-0147 : 0e    MVI  C 09
-0149 : cd    CALL 0005
-014c : d1    POP  D     
-014d : c9    RET        
+0051 : f5    PUSH PSW   
+0052 : cd    CALL 0061
+0055 : 5f    MOV  E, A
+0056 : cd    CALL 004e
+0059 : f1    POP  PSW   
+005a : cd    CALL 0065
+005d : 5f    MOV  E, A
+005e : c3    JMP  004e
 
 ...
 
-014e : 0e    MVI  C 02
-0150 : cd    CALL 0005
-0153 : c9    RET        
+0061 : 0f    RRC        
+0062 : 0f    RRC        
+0063 : 0f    RRC        
+0064 : 0f    RRC        
+0065 : e6    ANI 0f
+0067 : fe    CPI 0a
+0069 : fa    JM   006e
+006c : c6    ADI 07
+006e : c6    ADI 30
+0070 : c9    RET        
 
 ...
 
-0154 : f5    PUSH PSW   
-0155 : cd    CALL 0164
-0158 : 5f    MOV  E, A
-0159 : cd    CALL 014e
-015c : f1    POP  PSW   
-015d : cd    CALL 0168
-0160 : 5f    MOV  E, A
-0161 : c3    JMP  014e
+00a8 : 31    LXI  SP 05ad
+00ab : e6    ANI 00
+00ad : ca    JZ   00b3
+00b0 : cd    CALL 0586
+00b3 : d2    JNC  00b9
+00b6 : cd    CALL 0586
+00b9 : ea    JPE  00bf
+00bc : cd    CALL 0586
+00bf : f2    JP   00c5
+00c2 : cd    CALL 0586
+00c5 : c2    JNZ  00d4
+00c8 : da    JC   00d4
+00cb : e2    JPO  00d4
+00ce : fa    JM   00d4
+00d1 : c3    JMP  00d7
 
 ...
 
-0164 : 0f    RRC        
-0165 : 0f    RRC        
-0166 : 0f    RRC        
-0167 : 0f    RRC        
-0168 : e6    ANI 0f
-016a : fe    CPI 0a
-016c : fa    JM   0171
-016f : c6    ADI 07
-0171 : c6    ADI 30
-0173 : c9    RET        
+00d4 : cd    CALL 0586
+00d7 : c6    ADI 06
+00d9 : c2    JNZ  00df
+00dc : cd    CALL 0586
+00df : da    JC   00e8
+00e2 : e2    JPO  00e8
+00e5 : f2    JP   00eb
+00e8 : cd    CALL 0586
+00eb : c6    ADI 70
+00ed : e2    JPO  00f3
+00f0 : cd    CALL 0586
+00f3 : fa    JM   00fc
+00f6 : ca    JZ   00fc
+00f9 : d2    JNC  00ff
+00fc : cd    CALL 0586
+00ff : c6    ADI 81
+0101 : fa    JM   0107
+0104 : cd    CALL 0586
+0107 : ca    JZ   0110
+010a : da    JC   0110
+010d : e2    JPO  0113
+0110 : cd    CALL 0586
+0113 : c6    ADI fe
+0115 : da    JC   011b
+0118 : cd    CALL 0586
+011b : ca    JZ   0124
+011e : e2    JPO  0124
+0121 : fa    JM   0127
+0124 : cd    CALL 0586
+0127 : fe    CPI 00
+0129 : da    JC   013f
+012c : ca    JZ   013f
+012f : fe    CPI f5
+0131 : da    JC   013f
+0134 : c2    JNZ  013f
+0137 : fe    CPI ff
+0139 : ca    JZ   013f
+013c : da    JC   0142
+013f : cd    CALL 0586
+0142 : ce    ACI 0a
+0144 : ce    ACI 0a
+0146 : fe    CPI 0b
+0148 : ca    JZ   014e
+014b : cd    CALL 0586
+014e : d6    SUI 0c
+0150 : d6    SUI 0f
+0152 : fe    CPI f0
+0154 : ca    JZ   015a
+0157 : cd    CALL 0586
+015a : de    SBI f1
+015c : de    SBI 0e
+015e : fe    CPI f0
+0160 : ca    JZ   0166
+0163 : cd    CALL 0586
+0166 : e6    ANI 55
+0168 : fe    CPI 50
+016a : ca    JZ   0170
+016d : cd    CALL 0586
+0170 : f6    ORI 3a
+0172 : fe    CPI 7a
+0174 : ca    JZ   017a
+0177 : cd    CALL 0586
+017a : ee    XRI 0f
+017c : fe    CPI 75
+017e : ca    JZ   0184
+0181 : cd    CALL 0586
+0184 : e6    ANI 00
+0186 : dc    CC   0586
+0189 : e4    CPO  0586
+018c : fc    CM   0586
+018f : c4    CNZ  0586
+0192 : fe    CPI 00
+0194 : ca    JZ   019a
+0197 : cd    CALL 0586
+019a : d6    SUI 77
+019c : d4    CNC  0586
+019f : ec    CPE  0586
+01a2 : f4    CP   0586
+01a5 : cc    CZ   0586
+01a8 : fe    CPI 89
+01aa : ca    JZ   01b0
+01ad : cd    CALL 0586
+01b0 : e6    ANI ff
+01b2 : e4    CPO  01bd
+01b5 : fe    CPI d9
+01b7 : ca    JZ   021a
+01ba : cd    CALL 0586
+01bd : e8    RPE        
+01be : c6    ADI 10
+01c0 : ec    CPE  01c9
+01c3 : c6    ADI 02
+01c5 : e0    RPO        
+01c6 : cd    CALL 0586
+01c9 : e0    RPO        
+01ca : c6    ADI 20
+01cc : fc    CM   01d5
+01cf : c6    ADI 04
+01d1 : e8    RPE        
+01d2 : cd    CALL 0586
+01d5 : f0    RP         
+01d6 : c6    ADI 80
+01d8 : f4    CP   01e1
+01db : c6    ADI 80
+01dd : f8    RM         
+01de : cd    CALL 0586
+01e1 : f8    RM         
+01e2 : c6    ADI 40
+01e4 : d4    CNC  01ed
+01e7 : c6    ADI 40
+01e9 : f0    RP         
+01ea : cd    CALL 0586
+01ed : d8    RC         
+01ee : c6    ADI 8f
+01f0 : dc    CC   01f9
+01f3 : d6    SUI 02
+01f5 : d0    RNC        
+01f6 : cd    CALL 0586
+01f9 : d0    RNC        
+01fa : c6    ADI f7
+01fc : c4    CNZ  0205
+01ff : c6    ADI fe
+0201 : d8    RC         
+0202 : cd    CALL 0586
+0205 : c8    RZ         
+0206 : c6    ADI 01
+0208 : cc    CZ   0211
+020b : c6    ADI d0
+020d : c0    RNZ        
+020e : cd    CALL 0586
+0211 : c0    RNZ        
+0212 : c6    ADI 47
+0214 : fe    CPI 47
+0216 : c8    RZ         
+0217 : cd    CALL 0586
+021a : 3e    MVI  A 77
+021c : 3c    INR  A     
+021d : 47    MOV  B, A
+021e : 04    INR  B     
+021f : 48    MOV  C, B
+0220 : 0d    DCR  C     
+0221 : 51    MOV  D, C
+0222 : 5a    MOV  E, D
+0223 : 63    MOV  H, E
+0224 : 6c    MOV  L, H
+0225 : 7d    MOV  A, L
+0226 : 3d    DCR  A     
+0227 : 4f    MOV  C, A
+0228 : 59    MOV  E, C
+0229 : 6b    MOV  L, E
+022a : 45    MOV  B, L
+022b : 50    MOV  D, B
+022c : 62    MOV  H, D
+022d : 7c    MOV  A, H
+022e : 57    MOV  D, A
+022f : 14    INR  D     
+0230 : 6a    MOV  L, D
+0231 : 4d    MOV  C, L
+0232 : 0c    INR  C     
+0233 : 61    MOV  H, C
+0234 : 44    MOV  B, H
+0235 : 05    DCR  B     
+0236 : 58    MOV  E, B
+0237 : 7b    MOV  A, E
+0238 : 5f    MOV  E, A
+0239 : 1c    INR  E     
+023a : 43    MOV  B, E
+023b : 60    MOV  H, B
+023c : 24    INR  H     
+023d : 4c    MOV  C, H
+023e : 69    MOV  L, C
+023f : 55    MOV  D, L
+0240 : 15    DCR  D     
+0241 : 7a    MOV  A, D
+0242 : 67    MOV  H, A
+0243 : 25    DCR  H     
+0244 : 54    MOV  D, H
+0245 : 42    MOV  B, D
+0246 : 68    MOV  L, B
+0247 : 2c    INR  L     
+0248 : 5d    MOV  E, L
+0249 : 1d    DCR  E     
+024a : 4b    MOV  C, E
+024b : 79    MOV  A, C
+024c : 6f    MOV  L, A
+024d : 2d    DCR  L     
+024e : 65    MOV  H, L
+024f : 5c    MOV  E, H
+0250 : 53    MOV  D, E
+0251 : 4a    MOV  C, D
+0252 : 41    MOV  B, C
+0253 : 78    MOV  A, B
+0254 : fe    CPI 77
+0256 : c4    CNZ  0586
+0259 : af    XRA  A     
+025a : 06    MVI  B 01
+025c : 0e    MVI  C 03
+025e : 16    MVI  D 07
+0260 : 1e    MVI  E 0f
+0262 : 26    MVI  H 1f
+0264 : 2e    MVI  L 3f
+0266 : 80    ADD  B     
+0267 : 81    ADD  C     
+0268 : 82    ADD  D     
+0269 : 83    ADD  E     
+026a : 84    ADD  H     
+026b : 85    ADD  L     
+026c : 87    ADD  A     
+026d : fe    CPI f0
+026f : c4    CNZ  0586
+0272 : 90    SUB  B     
+0273 : 91    SUB  C     
+0274 : 92    SUB  D     
+0275 : 93    SUB  E     
+0276 : 94    SUB  H     
+0277 : 95    SUB  L     
+0278 : fe    CPI 78
+027a : c4    CNZ  0586
+027d : 97    SUB  A     
+027e : c4    CNZ  0586
+0281 : 3e    MVI  A 80
+0283 : 87    ADD  A     
+0284 : 06    MVI  B 01
+0286 : 0e    MVI  C 02
+0288 : 16    MVI  D 03
+028a : 1e    MVI  E 04
+028c : 26    MVI  H 05
+028e : 2e    MVI  L 06
+0290 : 88    ADC  B     
+0291 : 06    MVI  B 80
+0293 : 80    ADD  B     
+0294 : 80    ADD  B     
+0295 : 89    ADC  C     
+0296 : 80    ADD  B     
+0297 : 80    ADD  B     
+0298 : 8a    ADC  D     
+0299 : 80    ADD  B     
+029a : 80    ADD  B     
+029b : 8b    ADC  E     
+029c : 80    ADD  B     
+029d : 80    ADD  B     
+029e : 8c    ADC  H     
+029f : 80    ADD  B     
+02a0 : 80    ADD  B     
+02a1 : 8d    ADC  L     
+02a2 : 80    ADD  B     
+02a3 : 80    ADD  B     
+02a4 : 8f    ADC  A     
+02a5 : fe    CPI 37
+02a7 : c4    CNZ  0586
+02aa : 3e    MVI  A 80
+02ac : 87    ADD  A     
+02ad : 06    MVI  B 01
+02af : 98    SBB  B     
+02b0 : 06    MVI  B ff
+02b2 : 80    ADD  B     
+02b3 : 99    SBB  C     
+02b4 : 80    ADD  B     
+02b5 : 9a    SBB  D     
+02b6 : 80    ADD  B     
+02b7 : 9b    SBB  E     
+02b8 : 80    ADD  B     
+02b9 : 9c    SBB  H     
+02ba : 80    ADD  B     
+02bb : 9d    SBB  L     
+02bc : fe    CPI e0
+02be : c4    CNZ  0586
+02c1 : 3e    MVI  A 80
+02c3 : 87    ADD  A     
+02c4 : 9f    SBB  A     
+02c5 : fe    CPI ff
+02c7 : c4    CNZ  0586
+02ca : 3e    MVI  A ff
+02cc : 06    MVI  B fe
+02ce : 0e    MVI  C fc
+02d0 : 16    MVI  D ef
+02d2 : 1e    MVI  E 7f
+02d4 : 26    MVI  H f4
+02d6 : 2e    MVI  L bf
+02d8 : a7    ANA  A     
+02d9 : a1    ANA  C     
+02da : a2    ANA  D     
+02db : a3    ANA  E     
+02dc : a4    ANA  H     
+02dd : a5    ANA  L     
+02de : a7    ANA  A     
+02df : fe    CPI 24
+02e1 : c4    CNZ  0586
+02e4 : af    XRA  A     
+02e5 : 06    MVI  B 01
+02e7 : 0e    MVI  C 02
+02e9 : 16    MVI  D 04
+02eb : 1e    MVI  E 08
+02ed : 26    MVI  H 10
+02ef : 2e    MVI  L 20
+02f1 : b0    ORA  B     
+02f2 : b1    ORA  C     
+02f3 : b2    ORA  D     
+02f4 : b3    ORA  E     
+02f5 : b4    ORA  H     
+02f6 : b5    ORA  L     
+02f7 : b7    ORA  A     
+02f8 : fe    CPI 3f
+02fa : c4    CNZ  0586
+02fd : 3e    MVI  A 00
+02ff : 26    MVI  H 8f
+0301 : 2e    MVI  L 4f
+0303 : a8    XRA  B     
+0304 : a9    XRA  C     
+0305 : aa    XRA  D     
+0306 : ab    XRA  E     
+0307 : ac    XRA  H     
+0308 : ad    XRA  L     
+0309 : fe    CPI cf
+030b : c4    CNZ  0586
+030e : af    XRA  A     
+030f : c4    CNZ  0586
+0312 : 06    MVI  B 44
+0314 : 0e    MVI  C 45
+0316 : 16    MVI  D 46
+0318 : 1e    MVI  E 47
+031a : 26    MVI  H 05
+031c : 2e    MVI  L a6
+031e : 70    MOV  M, B
+031f : 06    MVI  B 00
+0321 : 46    MOV  B, M  
+0322 : 3e    MVI  A 44
+0324 : b8    CMP  B     
+0325 : c4    CNZ  0586
+0328 : 72    MOV  M, D
+0329 : 16    MVI  D 00
+032b : 56    MOV  D, M  
+032c : 3e    MVI  A 46
+032e : ba    CMP  D     
+032f : c4    CNZ  0586
+0332 : 73    MOV  M, E
+0333 : 1e    MVI  E 00
+0335 : 5e    MOV  E, M  
+0336 : 3e    MVI  A 47
+0338 : bb    CMP  E     
+0339 : c4    CNZ  0586
+033c : 74    MOV  M, H
+033d : 26    MVI  H 05
+033f : 2e    MVI  L a6
+0341 : 66    MOV  H, M  
+0342 : 3e    MVI  A 05
+0344 : bc    CMP  H     
+0345 : c4    CNZ  0586
+0348 : 75    MOV  M, L
+0349 : 26    MVI  H 05
+034b : 2e    MVI  L a6
+034d : 6e    MOV  L, M  
+034e : 3e    MVI  A a6
+0350 : bd    CMP  L     
+0351 : c4    CNZ  0586
+0354 : 26    MVI  H 05
+0356 : 2e    MVI  L a6
+0358 : 3e    MVI  A 32
+035a : 77    MOV  M, A
+035b : be    CMP  M     
+035c : c4    CNZ  0586
+035f : 86    ADD  M     
+0360 : fe    CPI 64
+0362 : c4    CNZ  0586
+0365 : af    XRA  A     
+0366 : 7e    MOV  A, M  
+0367 : fe    CPI 32
+0369 : c4    CNZ  0586
+036c : 26    MVI  H 05
+036e : 2e    MVI  L a6
+0370 : 7e    MOV  A, M  
+0371 : 96    SUB  M     
+0372 : c4    CNZ  0586
+0375 : 3e    MVI  A 80
+0377 : 87    ADD  A     
+0378 : 8e    ADC  M     
+0379 : fe    CPI 33
+037b : c4    CNZ  0586
+037e : 3e    MVI  A 80
+0380 : 87    ADD  A     
+0381 : 9e    SBB  M     
+0382 : fe    CPI cd
+0384 : c4    CNZ  0586
+0387 : a6    ANA  M     
+0388 : c4    CNZ  0586
+038b : 3e    MVI  A 25
+038d : b6    ORA  M     
+038e : fe    CPI 37
+0390 : c4    CNZ  0586
+0393 : ae    XRA  M     
+0394 : fe    CPI 05
+0396 : c4    CNZ  0586
+0399 : 36    MVI  M 55
+039b : 34    INR  M     
+039c : 35    DCR  M     
+039d : 86    ADD  M     
+039e : fe    CPI 5a
+03a0 : c4    CNZ  0586
+03a3 : 01    LXI  B 12ff
+03a6 : 11    LXI  D 12ff
+03a9 : 21    LXI  H 12ff
+03ac : 03    INX  B     
+03ad : 13    INX  D     
+03ae : 23    INX  H     
+03af : 3e    MVI  A 13
+03b1 : b8    CMP  B     
+03b2 : c4    CNZ  0586
+03b5 : ba    CMP  D     
+03b6 : c4    CNZ  0586
+03b9 : bc    CMP  H     
+03ba : c4    CNZ  0586
+03bd : 3e    MVI  A 00
+03bf : b9    CMP  C     
+03c0 : c4    CNZ  0586
+03c3 : bb    CMP  E     
+03c4 : c4    CNZ  0586
+03c7 : bd    CMP  L     
+03c8 : c4    CNZ  0586
+03cb : 0b    DCX  B     
+03cc : 1b    DCX  D     
+03cd : 2b    DCX  H     
+03ce : 3e    MVI  A 12
+03d0 : b8    CMP  B     
+03d1 : c4    CNZ  0586
+03d4 : ba    CMP  D     
+03d5 : c4    CNZ  0586
+03d8 : bc    CMP  H     
+03d9 : c4    CNZ  0586
+03dc : 3e    MVI  A ff
+03de : b9    CMP  C     
+03df : c4    CNZ  0586
+03e2 : bb    CMP  E     
+03e3 : c4    CNZ  0586
+03e6 : bd    CMP  L     
+03e7 : c4    CNZ  0586
+03ea : 32    STA 05a6
+03ed : af    XRA  A     
+03ee : 3a    LDA 05a6
+03f1 : fe    CPI ff
+03f3 : c4    CNZ  0586
+03f6 : 2a    LHLD  05a4
+03f9 : 22    SHLD  05a6
+03fc : 3a    LDA 05a4
+03ff : 47    MOV  B, A
+0400 : 3a    LDA 05a6
+0403 : b8    CMP  B     
+0404 : c4    CNZ  0586
+0407 : 3a    LDA 05a5
+040a : 47    MOV  B, A
+040b : 3a    LDA 05a7
+040e : b8    CMP  B     
+040f : c4    CNZ  0586
+0412 : 3e    MVI  A aa
+0414 : 32    STA 05a6
+0417 : 44    MOV  B, H
+0418 : 4d    MOV  C, L
+0419 : af    XRA  A     
+041a : 0a    LDAX B     
+041b : fe    CPI aa
+041d : c4    CNZ  0586
+0420 : 3c    INR  A     
+0421 : 02    STAX B     
+0422 : 3a    LDA 05a6
+0425 : fe    CPI ab
+0427 : c4    CNZ  0586
+042a : 3e    MVI  A 77
+042c : 32    STA 05a6
+042f : 2a    LHLD  05a4
+0432 : 11    LXI  D 0000
+0435 : eb    XCHG       
+0436 : af    XRA  A     
+0437 : 1a    LDAX D     
+0438 : fe    CPI 77
+043a : c4    CNZ  0586
+043d : af    XRA  A     
+043e : 84    ADD  H     
+043f : 85    ADD  L     
+0440 : c4    CNZ  0586
+0443 : 3e    MVI  A cc
+0445 : 12    STAX D     
+0446 : 3a    LDA 05a6
+0449 : fe    CPI cc
+044b : 12    STAX D     
+044c : 3a    LDA 05a6
+044f : fe    CPI cc
+0451 : c4    CNZ  0586
+0454 : 21    LXI  H 7777
+0457 : 29    DAD  H     
+0458 : 3e    MVI  A ee
+045a : bc    CMP  H     
+045b : c4    CNZ  0586
+045e : bd    CMP  L     
+045f : c4    CNZ  0586
+0462 : 21    LXI  H 5555
+0465 : 01    LXI  B ffff
+0468 : 09    DAD  B     
+0469 : 3e    MVI  A 55
+046b : d4    CNC  0586
+046e : bc    CMP  H     
+046f : c4    CNZ  0586
+0472 : 3e    MVI  A 54
+0474 : bd    CMP  L     
+0475 : c4    CNZ  0586
+0478 : 21    LXI  H aaaa
+047b : 11    LXI  D 3333
+047e : 19    DAD  D     
+047f : 3e    MVI  A dd
+0481 : bc    CMP  H     
+0482 : c4    CNZ  0586
+0485 : bd    CMP  L     
+0486 : c4    CNZ  0586
+0489 : 37    STC        
+048a : d4    CNC  0586
+048d : 3f    CMC        
+048e : dc    CC   0586
+0491 : 3e    MVI  A aa
+0493 : 2f    CMA        
+0494 : fe    CPI 55
+0496 : c4    CNZ  0586
+0499 : b7    ORA  A     
+049a : 27    DAA        
+049b : fe    CPI 55
+049d : c4    CNZ  0586
+04a0 : 3e    MVI  A 88
+04a2 : 87    ADD  A     
+04a3 : 27    DAA        
+04a4 : fe    CPI 76
+04a6 : c4    CNZ  0586
+04a9 : af    XRA  A     
+04aa : 3e    MVI  A aa
+04ac : 27    DAA        
+04ad : d4    CNC  0586
+04b0 : fe    CPI 10
+04b2 : c4    CNZ  0586
+04b5 : af    XRA  A     
+04b6 : 3e    MVI  A 9a
+04b8 : 27    DAA        
+04b9 : d4    CNC  0586
+04bc : c4    CNZ  0586
+04bf : 37    STC        
+04c0 : 3e    MVI  A 42
+04c2 : 07    RLC        
+04c3 : dc    CC   0586
+04c6 : 07    RLC        
+04c7 : d4    CNC  0586
+04ca : fe    CPI 09
+04cc : c4    CNZ  0586
+04cf : 0f    RRC        
+04d0 : d4    CNC  0586
+04d3 : 0f    RRC        
+04d4 : fe    CPI 42
+04d6 : c4    CNZ  0586
+04d9 : 17    RAL        
+04da : 17    RAL        
+04db : d4    CNC  0586
+04de : fe    CPI 08
+04e0 : c4    CNZ  0586
+04e3 : 1f    RAR        
+04e4 : 1f    RAR        
+04e5 : dc    CC   0586
+04e8 : fe    CPI 02
+04ea : c4    CNZ  0586
+04ed : 01    LXI  B 1234
+04f0 : 11    LXI  D aaaa
+04f3 : 21    LXI  H 5555
+04f6 : af    XRA  A     
+04f7 : c5    PUSH B     
+04f8 : d5    PUSH D     
+04f9 : e5    PUSH H     
+04fa : f5    PUSH PSW   
+04fb : 01    LXI  B 0000
+04fe : 11    LXI  D 0000
+0501 : 21    LXI  H 0000
+0504 : 3e    MVI  A c0
+0506 : c6    ADI f0
+0508 : f1    POP  PSW   
+0509 : e1    POP  H     
+050a : d1    POP  D     
+050b : c1    POP  B     
+050c : dc    CC   0586
+050f : c4    CNZ  0586
+0512 : e4    CPO  0586
+0515 : fc    CM   0586
+0518 : 3e    MVI  A 12
+051a : b8    CMP  B     
+051b : c4    CNZ  0586
+051e : 3e    MVI  A 34
+0520 : b9    CMP  C     
+0521 : c4    CNZ  0586
+0524 : 3e    MVI  A aa
+0526 : ba    CMP  D     
+0527 : c4    CNZ  0586
+052a : bb    CMP  E     
+052b : c4    CNZ  0586
+052e : 3e    MVI  A 55
+0530 : bc    CMP  H     
+0531 : c4    CNZ  0586
+0534 : bd    CMP  L     
+0535 : c4    CNZ  0586
+0538 : 21    LXI  H 0000
+053b : 39    DAD  SP    
+053c : 22    SHLD  05ab
+053f : 31    LXI  SP 05aa
+0542 : 3b    DCX  SP    
+0543 : 3b    DCX  SP    
+0544 : 33    INX  SP    
+0545 : 3b    DCX  SP    
+0546 : 3e    MVI  A 55
+0548 : 32    STA 05a8
+054b : 2f    CMA        
+054c : 32    STA 05a9
+054f : c1    POP  B     
+0550 : b8    CMP  B     
+0551 : c4    CNZ  0586
+0554 : 2f    CMA        
+0555 : b9    CMP  C     
+0556 : c4    CNZ  0586
+0559 : 21    LXI  H 05aa
+055c : f9    SPHL       
+055d : 21    LXI  H 7733
+0560 : 3b    DCX  SP    
+0561 : 3b    DCX  SP    
+0562 : e3    XTHL       
+0563 : 3a    LDA 05a9
+0566 : fe    CPI 77
+0568 : c4    CNZ  0586
+056b : 3a    LDA 05a8
+056e : fe    CPI 33
+0570 : c4    CNZ  0586
+0573 : 3e    MVI  A 55
+0575 : bd    CMP  L     
+0576 : c4    CNZ  0586
+0579 : 2f    CMA        
+057a : bc    CMP  H     
+057b : c4    CNZ  0586
+057e : 2a    LHLD  05ab
+0581 : f9    SPHL       
+0582 : 21    LXI  H 0596
+0585 : e9    PCHL       
+0586 : 00    NOP        
+0587 : 00    NOP        
+0588 : d3    OUT 00
+058a : e3    XTHL       
+058b : 7c    MOV  A, H
+058c : cd    CALL 0051
+058f : 7d    MOV  A, L
+0590 : cd    CALL 0051
+0593 : c3    JMP  059f
 
 ...
 
-01ab : 31    LXI  SP 07ad
-01ae : e6    ANI 00
-01b0 : ca    JZ   01b6
-01b3 : cd    CALL 0689
-01b6 : d2    JNC  01bc
-01b9 : cd    CALL 0689
-01bc : ea    JPE  01c2
-01bf : cd    CALL 0689
-01c2 : f2    JP   01c8
-01c5 : cd    CALL 0689
-01c8 : c2    JNZ  01d7
-01cb : da    JC   01d7
-01ce : e2    JPO  01d7
-01d1 : fa    JM   01d7
-01d4 : c3    JMP  01da
-
-...
-
-01d7 : cd    CALL 0689
-01da : c6    ADI 06
-01dc : c2    JNZ  01e2
-01df : cd    CALL 0689
-01e2 : da    JC   01eb
-01e5 : e2    JPO  01eb
-01e8 : f2    JP   01ee
-01eb : cd    CALL 0689
-01ee : c6    ADI 70
-01f0 : e2    JPO  01f6
-01f3 : cd    CALL 0689
-01f6 : fa    JM   01ff
-01f9 : ca    JZ   01ff
-01fc : d2    JNC  0202
-01ff : cd    CALL 0689
-0202 : c6    ADI 81
-0204 : fa    JM   020a
-0207 : cd    CALL 0689
-020a : ca    JZ   0213
-020d : da    JC   0213
-0210 : e2    JPO  0216
-0213 : cd    CALL 0689
-0216 : c6    ADI fe
-0218 : da    JC   021e
-021b : cd    CALL 0689
-021e : ca    JZ   0227
-0221 : e2    JPO  0227
-0224 : fa    JM   022a
-0227 : cd    CALL 0689
-022a : fe    CPI 00
-022c : da    JC   0242
-022f : ca    JZ   0242
-0232 : fe    CPI f5
-0234 : da    JC   0242
-0237 : c2    JNZ  0242
-023a : fe    CPI ff
-023c : ca    JZ   0242
-023f : da    JC   0245
-0242 : cd    CALL 0689
-0245 : ce    ACI 0a
-0247 : ce    ACI 0a
-0249 : fe    CPI 0b
-024b : ca    JZ   0251
-024e : cd    CALL 0689
-0251 : d6    SUI 0c
-0253 : d6    SUI 0f
-0255 : fe    CPI f0
-0257 : ca    JZ   025d
-025a : cd    CALL 0689
-025d : de    SBI f1
-025f : de    SBI 0e
-0261 : fe    CPI f0
-0263 : ca    JZ   0269
-0266 : cd    CALL 0689
-0269 : e6    ANI 55
-026b : fe    CPI 50
-026d : ca    JZ   0273
-0270 : cd    CALL 0689
-0273 : f6    ORI 3a
-0275 : fe    CPI 7a
-0277 : ca    JZ   027d
-027a : cd    CALL 0689
-027d : ee    XRI 0f
-027f : fe    CPI 75
-0281 : ca    JZ   0287
-0284 : cd    CALL 0689
-0287 : e6    ANI 00
-0289 : dc    CC   0689
-028c : e4    CPO  0689
-028f : fc    CM   0689
-0292 : c4    CNZ  0689
-0295 : fe    CPI 00
-0297 : ca    JZ   029d
-029a : cd    CALL 0689
-029d : d6    SUI 77
-029f : d4    CNC  0689
-02a2 : ec    CPE  0689
-02a5 : f4    CP   0689
-02a8 : cc    CZ   0689
-02ab : fe    CPI 89
-02ad : ca    JZ   02b3
-02b0 : cd    CALL 0689
-02b3 : e6    ANI ff
-02b5 : e4    CPO  02c0
-02b8 : fe    CPI d9
-02ba : ca    JZ   031d
-02bd : cd    CALL 0689
-02c0 : e8    RPE        
-02c1 : c6    ADI 10
-02c3 : ec    CPE  02cc
-02c6 : c6    ADI 02
-02c8 : e0    RPO        
-02c9 : cd    CALL 0689
-02cc : e0    RPO        
-02cd : c6    ADI 20
-02cf : fc    CM   02d8
-02d2 : c6    ADI 04
-02d4 : e8    RPE        
-02d5 : cd    CALL 0689
-02d8 : f0    RP         
-02d9 : c6    ADI 80
-02db : f4    CP   02e4
-02de : c6    ADI 80
-02e0 : f8    RM         
-02e1 : cd    CALL 0689
-02e4 : f8    RM         
-02e5 : c6    ADI 40
-02e7 : d4    CNC  02f0
-02ea : c6    ADI 40
-02ec : f0    RP         
-02ed : cd    CALL 0689
-02f0 : d8    RC         
-02f1 : c6    ADI 8f
-02f3 : dc    CC   02fc
-02f6 : d6    SUI 02
-02f8 : d0    RNC        
-02f9 : cd    CALL 0689
-02fc : d0    RNC        
-02fd : c6    ADI f7
-02ff : c4    CNZ  0308
-0302 : c6    ADI fe
-0304 : d8    RC         
-0305 : cd    CALL 0689
-0308 : c8    RZ         
-0309 : c6    ADI 01
-030b : cc    CZ   0314
-030e : c6    ADI d0
-0310 : c0    RNZ        
-0311 : cd    CALL 0689
-0314 : c0    RNZ        
-0315 : c6    ADI 47
-0317 : fe    CPI 47
-0319 : c8    RZ         
-031a : cd    CALL 0689
-031d : 3e    MVI  A 77
-031f : 3c    INR  A     
-0320 : 47    MOV  B, A
-0321 : 04    INR  B     
-0322 : 48    MOV  C, B
-0323 : 0d    DCR  C     
-0324 : 51    MOV  D, C
-0325 : 5a    MOV  E, D
-0326 : 63    MOV  H, E
-0327 : 6c    MOV  L, H
-0328 : 7d    MOV  A, L
-0329 : 3d    DCR  A     
-032a : 4f    MOV  C, A
-032b : 59    MOV  E, C
-032c : 6b    MOV  L, E
-032d : 45    MOV  B, L
-032e : 50    MOV  D, B
-032f : 62    MOV  H, D
-0330 : 7c    MOV  A, H
-0331 : 57    MOV  D, A
-0332 : 14    INR  D     
-0333 : 6a    MOV  L, D
-0334 : 4d    MOV  C, L
-0335 : 0c    INR  C     
-0336 : 61    MOV  H, C
-0337 : 44    MOV  B, H
-0338 : 05    DCR  B     
-0339 : 58    MOV  E, B
-033a : 7b    MOV  A, E
-033b : 5f    MOV  E, A
-033c : 1c    INR  E     
-033d : 43    MOV  B, E
-033e : 60    MOV  H, B
-033f : 24    INR  H     
-0340 : 4c    MOV  C, H
-0341 : 69    MOV  L, C
-0342 : 55    MOV  D, L
-0343 : 15    DCR  D     
-0344 : 7a    MOV  A, D
-0345 : 67    MOV  H, A
-0346 : 25    DCR  H     
-0347 : 54    MOV  D, H
-0348 : 42    MOV  B, D
-0349 : 68    MOV  L, B
-034a : 2c    INR  L     
-034b : 5d    MOV  E, L
-034c : 1d    DCR  E     
-034d : 4b    MOV  C, E
-034e : 79    MOV  A, C
-034f : 6f    MOV  L, A
-0350 : 2d    DCR  L     
-0351 : 65    MOV  H, L
-0352 : 5c    MOV  E, H
-0353 : 53    MOV  D, E
-0354 : 4a    MOV  C, D
-0355 : 41    MOV  B, C
-0356 : 78    MOV  A, B
-0357 : fe    CPI 77
-0359 : c4    CNZ  0689
-035c : af    XRA  A     
-035d : 06    MVI  B 01
-035f : 0e    MVI  C 03
-0361 : 16    MVI  D 07
-0363 : 1e    MVI  E 0f
-0365 : 26    MVI  H 1f
-0367 : 2e    MVI  L 3f
-0369 : 80    ADD  B     
-036a : 81    ADD  C     
-036b : 82    ADD  D     
-036c : 83    ADD  E     
-036d : 84    ADD  H     
-036e : 85    ADD  L     
-036f : 87    ADD  A     
-0370 : fe    CPI f0
-0372 : c4    CNZ  0689
-0375 : 90    SUB  B     
-0376 : 91    SUB  C     
-0377 : 92    SUB  D     
-0378 : 93    SUB  E     
-0379 : 94    SUB  H     
-037a : 95    SUB  L     
-037b : fe    CPI 78
-037d : c4    CNZ  0689
-0380 : 97    SUB  A     
-0381 : c4    CNZ  0689
-0384 : 3e    MVI  A 80
-0386 : 87    ADD  A     
-0387 : 06    MVI  B 01
-0389 : 0e    MVI  C 02
-038b : 16    MVI  D 03
-038d : 1e    MVI  E 04
-038f : 26    MVI  H 05
-0391 : 2e    MVI  L 06
-0393 : 88    ADC  B     
-0394 : 06    MVI  B 80
-0396 : 80    ADD  B     
-0397 : 80    ADD  B     
-0398 : 89    ADC  C     
-0399 : 80    ADD  B     
-039a : 80    ADD  B     
-039b : 8a    ADC  D     
-039c : 80    ADD  B     
-039d : 80    ADD  B     
-039e : 8b    ADC  E     
-039f : 80    ADD  B     
-03a0 : 80    ADD  B     
-03a1 : 8c    ADC  H     
-03a2 : 80    ADD  B     
-03a3 : 80    ADD  B     
-03a4 : 8d    ADC  L     
-03a5 : 80    ADD  B     
-03a6 : 80    ADD  B     
-03a7 : 8f    ADC  A     
-03a8 : fe    CPI 37
-03aa : c4    CNZ  0689
-03ad : 3e    MVI  A 80
-03af : 87    ADD  A     
-03b0 : 06    MVI  B 01
-03b2 : 98    SBB  B     
-03b3 : 06    MVI  B ff
-03b5 : 80    ADD  B     
-03b6 : 99    SBB  C     
-03b7 : 80    ADD  B     
-03b8 : 9a    SBB  D     
-03b9 : 80    ADD  B     
-03ba : 9b    SBB  E     
-03bb : 80    ADD  B     
-03bc : 9c    SBB  H     
-03bd : 80    ADD  B     
-03be : 9d    SBB  L     
-03bf : fe    CPI e0
-03c1 : c4    CNZ  0689
-03c4 : 3e    MVI  A 80
-03c6 : 87    ADD  A     
-03c7 : 9f    SBB  A     
-03c8 : fe    CPI ff
-03ca : c4    CNZ  0689
-03cd : 3e    MVI  A ff
-03cf : 06    MVI  B fe
-03d1 : 0e    MVI  C fc
-03d3 : 16    MVI  D ef
-03d5 : 1e    MVI  E 7f
-03d7 : 26    MVI  H f4
-03d9 : 2e    MVI  L bf
-03db : a7    ANA  A     
-03dc : a1    ANA  C     
-03dd : a2    ANA  D     
-03de : a3    ANA  E     
-03df : a4    ANA  H     
-03e0 : a5    ANA  L     
-03e1 : a7    ANA  A     
-03e2 : fe    CPI 24
-03e4 : c4    CNZ  0689
-03e7 : af    XRA  A     
-03e8 : 06    MVI  B 01
-03ea : 0e    MVI  C 02
-03ec : 16    MVI  D 04
-03ee : 1e    MVI  E 08
-03f0 : 26    MVI  H 10
-03f2 : 2e    MVI  L 20
-03f4 : b0    ORA  B     
-03f5 : b1    ORA  C     
-03f6 : b2    ORA  D     
-03f7 : b3    ORA  E     
-03f8 : b4    ORA  H     
-03f9 : b5    ORA  L     
-03fa : b7    ORA  A     
-03fb : fe    CPI 3f
-03fd : c4    CNZ  0689
-0400 : 3e    MVI  A 00
-0402 : 26    MVI  H 8f
-0404 : 2e    MVI  L 4f
-0406 : a8    XRA  B     
-0407 : a9    XRA  C     
-0408 : aa    XRA  D     
-0409 : ab    XRA  E     
-040a : ac    XRA  H     
-040b : ad    XRA  L     
-040c : fe    CPI cf
-040e : c4    CNZ  0689
-0411 : af    XRA  A     
-0412 : c4    CNZ  0689
-0415 : 06    MVI  B 44
-0417 : 0e    MVI  C 45
-0419 : 16    MVI  D 46
-041b : 1e    MVI  E 47
-041d : 26    MVI  H 06
-041f : 2e    MVI  L a6
-0421 : 70    MOV  M, B
-0422 : 06    MVI  B 00
-0424 : 46    MOV  B, M  
-0425 : 3e    MVI  A 44
-0427 : b8    CMP  B     
-0428 : c4    CNZ  0689
-042b : 72    MOV  M, D
-042c : 16    MVI  D 00
-042e : 56    MOV  D, M  
-042f : 3e    MVI  A 46
-0431 : ba    CMP  D     
-0432 : c4    CNZ  0689
-0435 : 73    MOV  M, E
-0436 : 1e    MVI  E 00
-0438 : 5e    MOV  E, M  
-0439 : 3e    MVI  A 47
-043b : bb    CMP  E     
-043c : c4    CNZ  0689
-043f : 74    MOV  M, H
-0440 : 26    MVI  H 06
-0442 : 2e    MVI  L a6
-0444 : 66    MOV  H, M  
-0445 : 3e    MVI  A 06
-0447 : bc    CMP  H     
-0448 : c4    CNZ  0689
-044b : 75    MOV  M, L
-044c : 26    MVI  H 06
-044e : 2e    MVI  L a6
-0450 : 6e    MOV  L, M  
-0451 : 3e    MVI  A a6
-0453 : bd    CMP  L     
-0454 : c4    CNZ  0689
-0457 : 26    MVI  H 06
-0459 : 2e    MVI  L a6
-045b : 3e    MVI  A 32
-045d : 77    MOV  M, A
-045e : be    CMP  M     
-045f : c4    CNZ  0689
-0462 : 86    ADD  M     
-0463 : fe    CPI 64
-0465 : c4    CNZ  0689
-0468 : af    XRA  A     
-0469 : 7e    MOV  A, M  
-046a : fe    CPI 32
-046c : c4    CNZ  0689
-046f : 26    MVI  H 06
-0471 : 2e    MVI  L a6
-0473 : 7e    MOV  A, M  
-0474 : 96    SUB  M     
-0475 : c4    CNZ  0689
-0478 : 3e    MVI  A 80
-047a : 87    ADD  A     
-047b : 8e    ADC  M     
-047c : fe    CPI 33
-047e : c4    CNZ  0689
-0481 : 3e    MVI  A 80
-0483 : 87    ADD  A     
-0484 : 9e    SBB  M     
-0485 : fe    CPI cd
-0487 : c4    CNZ  0689
-048a : a6    ANA  M     
-048b : c4    CNZ  0689
-048e : 3e    MVI  A 25
-0490 : b6    ORA  M     
-0491 : fe    CPI 37
-0493 : c4    CNZ  0689
-0496 : ae    XRA  M     
-0497 : fe    CPI 05
-0499 : c4    CNZ  0689
-049c : 36    MVI  M 55
-049e : 34    INR  M     
-049f : 35    DCR  M     
-04a0 : 86    ADD  M     
-04a1 : fe    CPI 5a
-04a3 : c4    CNZ  0689
-04a6 : 01    LXI  B 12ff
-04a9 : 11    LXI  D 12ff
-04ac : 21    LXI  H 12ff
-04af : 03    INX  B     
-04b0 : 13    INX  D     
-04b1 : 23    INX  H     
-04b2 : 3e    MVI  A 13
-04b4 : b8    CMP  B     
-04b5 : c4    CNZ  0689
-04b8 : ba    CMP  D     
-04b9 : c4    CNZ  0689
-04bc : bc    CMP  H     
-04bd : c4    CNZ  0689
-04c0 : 3e    MVI  A 00
-04c2 : b9    CMP  C     
-04c3 : c4    CNZ  0689
-04c6 : bb    CMP  E     
-04c7 : c4    CNZ  0689
-04ca : bd    CMP  L     
-04cb : c4    CNZ  0689
-04ce : 0b    DCX  B     
-04cf : 1b    DCX  D     
-04d0 : 2b    DCX  H     
-04d1 : 3e    MVI  A 12
-04d3 : b8    CMP  B     
-04d4 : c4    CNZ  0689
-04d7 : ba    CMP  D     
-04d8 : c4    CNZ  0689
-04db : bc    CMP  H     
-04dc : c4    CNZ  0689
-04df : 3e    MVI  A ff
-04e1 : b9    CMP  C     
-04e2 : c4    CNZ  0689
-04e5 : bb    CMP  E     
-04e6 : c4    CNZ  0689
-04e9 : bd    CMP  L     
-04ea : c4    CNZ  0689
-04ed : 32    STA 06a6
-04f0 : af    XRA  A     
-04f1 : 3a    LDA 06a6
-04f4 : fe    CPI ff
-04f6 : c4    CNZ  0689
-04f9 : 2a    LHLD  06a4
-04fc : 22    SHLD  06a6
-04ff : 3a    LDA 06a4
-0502 : 47    MOV  B, A
-0503 : 3a    LDA 06a6
-0506 : b8    CMP  B     
-0507 : c4    CNZ  0689
-050a : 3a    LDA 06a5
-050d : 47    MOV  B, A
-050e : 3a    LDA 06a7
-0511 : b8    CMP  B     
-0512 : c4    CNZ  0689
-0515 : 3e    MVI  A aa
-0517 : 32    STA 06a6
-051a : 44    MOV  B, H
-051b : 4d    MOV  C, L
-051c : af    XRA  A     
-051d : 0a    LDAX B     
-051e : fe    CPI aa
-0520 : c4    CNZ  0689
-0523 : 3c    INR  A     
-0524 : 02    STAX B     
-0525 : 3a    LDA 06a6
-0528 : fe    CPI ab
-052a : c4    CNZ  0689
-052d : 3e    MVI  A 77
-052f : 32    STA 06a6
-0532 : 2a    LHLD  06a4
-0535 : 11    LXI  D 0000
-0538 : eb    XCHG       
-0539 : af    XRA  A     
-053a : 1a    LDAX D     
-053b : fe    CPI 77
-053d : c4    CNZ  0689
-0540 : af    XRA  A     
-0541 : 84    ADD  H     
-0542 : 85    ADD  L     
-0543 : c4    CNZ  0689
-0546 : 3e    MVI  A cc
-0548 : 12    STAX D     
-0549 : 3a    LDA 06a6
-054c : fe    CPI cc
-054e : 12    STAX D     
-054f : 3a    LDA 06a6
-0552 : fe    CPI cc
-0554 : c4    CNZ  0689
-0557 : 21    LXI  H 7777
-055a : 29    DAD  H     
-055b : 3e    MVI  A ee
-055d : bc    CMP  H     
-055e : c4    CNZ  0689
-0561 : bd    CMP  L     
-0562 : c4    CNZ  0689
-0565 : 21    LXI  H 5555
-0568 : 01    LXI  B ffff
-056b : 09    DAD  B     
-056c : 3e    MVI  A 55
-056e : d4    CNC  0689
-0571 : bc    CMP  H     
-0572 : c4    CNZ  0689
-0575 : 3e    MVI  A 54
-0577 : bd    CMP  L     
-0578 : c4    CNZ  0689
-057b : 21    LXI  H aaaa
-057e : 11    LXI  D 3333
-0581 : 19    DAD  D     
-0582 : 3e    MVI  A dd
-0584 : bc    CMP  H     
-0585 : c4    CNZ  0689
-0588 : bd    CMP  L     
-0589 : c4    CNZ  0689
-058c : 37    STC        
-058d : d4    CNC  0689
-0590 : 3f    CMC        
-0591 : dc    CC   0689
-0594 : 3e    MVI  A aa
-0596 : 2f    CMA        
-0597 : fe    CPI 55
-0599 : c4    CNZ  0689
-059c : b7    ORA  A     
-059d : 27    DAA        
-059e : fe    CPI 55
-05a0 : c4    CNZ  0689
-05a3 : 3e    MVI  A 88
-05a5 : 87    ADD  A     
-05a6 : 27    DAA        
-05a7 : fe    CPI 76
-05a9 : c4    CNZ  0689
-05ac : af    XRA  A     
-05ad : 3e    MVI  A aa
-05af : 27    DAA        
-05b0 : d4    CNC  0689
-05b3 : fe    CPI 10
-05b5 : c4    CNZ  0689
-05b8 : af    XRA  A     
-05b9 : 3e    MVI  A 9a
-05bb : 27    DAA        
-05bc : d4    CNC  0689
-05bf : c4    CNZ  0689
-05c2 : 37    STC        
-05c3 : 3e    MVI  A 42
-05c5 : 07    RLC        
-05c6 : dc    CC   0689
-05c9 : 07    RLC        
-05ca : d4    CNC  0689
-05cd : fe    CPI 09
-05cf : c4    CNZ  0689
-05d2 : 0f    RRC        
-05d3 : d4    CNC  0689
-05d6 : 0f    RRC        
-05d7 : fe    CPI 42
-05d9 : c4    CNZ  0689
-05dc : 17    RAL        
-05dd : 17    RAL        
-05de : d4    CNC  0689
-05e1 : fe    CPI 08
-05e3 : c4    CNZ  0689
-05e6 : 1f    RAR        
-05e7 : 1f    RAR        
-05e8 : dc    CC   0689
-05eb : fe    CPI 02
-05ed : c4    CNZ  0689
-05f0 : 01    LXI  B 1234
-05f3 : 11    LXI  D aaaa
-05f6 : 21    LXI  H 5555
-05f9 : af    XRA  A     
-05fa : c5    PUSH B     
-05fb : d5    PUSH D     
-05fc : e5    PUSH H     
-05fd : f5    PUSH PSW   
-05fe : 01    LXI  B 0000
-0601 : 11    LXI  D 0000
-0604 : 21    LXI  H 0000
-0607 : 3e    MVI  A c0
-0609 : c6    ADI f0
-060b : f1    POP  PSW   
-060c : e1    POP  H     
-060d : d1    POP  D     
-060e : c1    POP  B     
-060f : dc    CC   0689
-0612 : c4    CNZ  0689
-0615 : e4    CPO  0689
-0618 : fc    CM   0689
-061b : 3e    MVI  A 12
-061d : b8    CMP  B     
-061e : c4    CNZ  0689
-0621 : 3e    MVI  A 34
-0623 : b9    CMP  C     
-0624 : c4    CNZ  0689
-0627 : 3e    MVI  A aa
-0629 : ba    CMP  D     
-062a : c4    CNZ  0689
-062d : bb    CMP  E     
-062e : c4    CNZ  0689
-0631 : 3e    MVI  A 55
-0633 : bc    CMP  H     
-0634 : c4    CNZ  0689
-0637 : bd    CMP  L     
-0638 : c4    CNZ  0689
-063b : 21    LXI  H 0000
-063e : 39    DAD  SP    
-063f : 22    SHLD  06ab
-0642 : 31    LXI  SP 06aa
-0645 : 3b    DCX  SP    
-0646 : 3b    DCX  SP    
-0647 : 33    INX  SP    
-0648 : 3b    DCX  SP    
-0649 : 3e    MVI  A 55
-064b : 32    STA 06a8
-064e : 2f    CMA        
-064f : 32    STA 06a9
-0652 : c1    POP  B     
-0653 : b8    CMP  B     
-0654 : c4    CNZ  0689
-0657 : 2f    CMA        
-0658 : b9    CMP  C     
-0659 : c4    CNZ  0689
-065c : 21    LXI  H 06aa
-065f : f9    SPHL       
-0660 : 21    LXI  H 7733
-0663 : 3b    DCX  SP    
-0664 : 3b    DCX  SP    
-0665 : e3    XTHL       
-0666 : 3a    LDA 06a9
-0669 : fe    CPI 77
-066b : c4    CNZ  0689
-066e : 3a    LDA 06a8
-0671 : fe    CPI 33
-0673 : c4    CNZ  0689
-0676 : 3e    MVI  A 55
-0678 : bd    CMP  L     
-0679 : c4    CNZ  0689
-067c : 2f    CMA        
-067d : bc    CMP  H     
-067e : c4    CNZ  0689
-0681 : 2a    LHLD  06ab
-0684 : f9    SPHL       
-0685 : 21    LXI  H 069b
-0688 : e9    PCHL       
-0689 : 21    LXI  H 018b
-068c : cd    CALL 0145
-068f : e3    XTHL       
-0690 : 7c    MOV  A, H
-0691 : cd    CALL 0154
-0694 : 7d    MOV  A, L
-0695 : cd    CALL 0154
-0698 : c3    JMP  0000
+059f : d3    OUT 03
+05a1 : c3    JMP  05a1

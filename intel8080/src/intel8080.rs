@@ -1,3 +1,21 @@
+pub trait IODevices : Send {
+    fn read(&mut self, device: u8) -> u8;
+    fn write(&mut self, device: u8, value: u8);
+}
+
+pub trait Memory : Send {
+    fn read(&self, adress: u16) -> u8;
+    fn write(&mut self, adress: u16, value: u8);
+
+    fn get_rom(&mut self) -> Vec<u8>;
+
+    fn read_u16(&self, adress: u16) -> u16 {
+        u16::from_le_bytes(
+            [self.read(adress), self.read(adress + 1)]
+        )
+    }
+}
+
 
 #[repr(C)]
 #[allow(non_snake_case)]
@@ -13,7 +31,6 @@ pub struct I8080State {
     SP: u16,
     PC: u16,
     pub interrupt_enabled: bool,
-    pub memory: [u8; 0x4000],
 }
 #[allow(non_snake_case)]
 impl I8080State {
@@ -29,9 +46,7 @@ impl I8080State {
             L: 0,
             SP: 0,
             PC: 0,
-            interrupt_enabled: true,
-
-            memory: [0; 0x4000],
+            interrupt_enabled: false,
         }
     }
 
@@ -75,57 +90,48 @@ impl I8080State {
     }
     pub fn set_PC(&mut self, value: u16) {
         self.PC = value.to_le();
+        // if self.PC > 0x1a90 {
+        //     println!("Program Counter escaped the program!!");
+        // }
     }
 
-    pub fn push_stack(&mut self, value: u16) {
-        unsafe { *(&mut self.memory[(u16::from_le(self.SP) as usize) - 2] as *mut u8 as *mut u16) = value.to_le(); }
+    pub fn push_stack<M: Memory>(&mut self, value: u16, memory: &mut M) {
+        memory.write(self.get_SP() - 2, (value.to_le() & 0xff) as u8);
+        memory.write(self.get_SP() - 1, ((value.to_le() >> 8) & 0xff) as u8);
         self.SP = (u16::from_le(self.SP) - 2).to_le();
+        // if self.get_SP() <= 0x2000 {
+        //     println!("STACK OVERFLOW!");
+        // }
     }
-    pub fn pop_stack(&mut self) -> u16 {
+    pub fn pop_stack<M: Memory>(&mut self, memory: &M) -> u16 {
         self.SP = (u16::from_le(self.SP) + 2).to_le();
-        unsafe { u16::from_le(*(&mut self.memory[(u16::from_le(self.SP) as usize) - 2] as *mut u8 as *mut u16)) }
-    }
-
-    pub fn get_op(&self) -> u8 {
-        self.memory[self.PC as usize]
-    }
-
-    pub fn get_u8(&self) -> u8 {
-        self.memory[self.PC as usize + 1]
-    }
-
-    pub fn get_u16(&self) -> u16 {
-        u16::from_le_bytes(
-            [self.memory[self.PC as usize + 1], self.memory[self.PC as usize + 2]]
-        )
-    }
-
-    pub fn get_memory(&self, adress: u16) -> u8 {
-        self.memory[(adress & 0x3fff) as usize]
-    }
-
-    pub fn set_memory(&mut self, adress: u16, value: u8) {
-        self.memory[(adress & 0x3fff) as usize] = value;
+        // if self.get_SP() > 0x2400 {
+        //     println!("STACK UNDERFLOW!?");
+        // }
+        
+        memory.read(self.get_SP() - 2) as u16 |
+        (memory.read(self.get_SP() - 1) as u16) << 8
+        
     }
 
     /// set all flags
     pub fn set_flags(&mut self, result: u8, carry: bool, auxcarry: bool) {
-        self.Flags = 
-           (carry as u8) // carry
-         | ((!(result.count_ones() as u8) & 1) << 2) // parity
-         | (result & ((auxcarry as u8) << 4)) // auxcarry
-         | ( ((result == 0) as u8) << 6 ) // zero
-         | (result & 0b1000_0000); // sign
+        self.Flags = 0b0000_0010
+            | (carry as u8) // carry
+            | ((!(result.count_ones() as u8) & 1) << 2) // parity
+            | (result & ((auxcarry as u8) << 4)) // auxcarry
+            | ( ((result == 0) as u8) << 6 ) // zero
+            | (result & 0b1000_0000); // sign
     }
 
     /// set all flags except carry
     pub fn set_flags_ex(&mut self, result: u8, auxcarry: bool) {
-        self.Flags = 
-           (self.Flags & 1) // carry
-         | ((!(result.count_ones() as u8) & 1) << 2) // parity
-         | (result & ((auxcarry as u8) << 4)) // auxcarry
-         | ( ((result == 0) as u8) << 6 ) // zero
-         | (result & 0b1000_0000); // sign
+        self.Flags = 0b0000_0010
+            | (self.Flags & 1) // carry
+            | ((!(result.count_ones() as u8) & 1) << 2) // parity
+            | (result & ((auxcarry as u8) << 4)) // auxcarry
+            | ( ((result == 0) as u8) << 6 ) // zero
+            | (result & 0b1000_0000); // sign
     }
 
     pub fn set_carry(&mut self, carry: bool) {
