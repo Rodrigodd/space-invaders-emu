@@ -1,113 +1,113 @@
-Mnemonic    | Description                           | bit pattern | clock time | flags
+Mnemonic    | Description                           | bit pattern |size|clock time | flags
 
-MOV  r1, r2 | Move register to register             | 01DDDSSS    |  5         | 
-MOV  M, r   | Move register to memory               | 01110SSS    |  7         | 
-MOV  r, M   | Move memory to register               | 01DDD110    |  7         | 
-HLT         | Halt                                  | 01110110    |  7         | 
-MVI  r      | Move immediate to register            | 00DDD110    |  7         | 
-MVI  M      | Move immediate to memory              | 00110110    | 10         | 
-INR  r      | Increment register                    | 00DDD100    |  5         | Z, S, P, AC
-DCR  r      | Decrement register                    | 00DDD101    |  5         | Z, S, P, AC
-INR  M      | Increment memory                      | 00110100    | 10         | Z, S, P, AC
-DCR  M      | Decrement memory                      | 00110101    | 10         | Z, S, P, AC
-ADD  r      | Add register to A                     | 10000SSS    |  4         | Z, S, P, CY, AC
-ADC  r      | Add register to A with carry          | 10001SSS    |  4         | Z, S, P, CY, AC
-SUB  r      | Subtract register from A              | 10010SSS    |  4         | Z, S, P, CY, AC
-SBB  r      | Subtract register from A with borrow  | 10011SSS    |  4         | Z, S, P, CY, AC
-ANA  r      | And register with A                   | 10100SSS    |  4         | Z, S, P, CY?, AC
-XRA  r      | Exclusive Or register with A          | 10101SSS    |  4         | Z, S, P, CY?, AC
-ORA  r      | Or register with A                    | 10110SSS    |  4         | Z, S, P, CY?, AC
-CMP  r      | Compare register with A               | 10111SSS    |  4         | Z, S, P, CY, AC
-ADD  M      | Add memory to A                       | 10000110    |  7         | Z, S, P, CY, AC
-ADC  M      | Add memory to A with carry            | 10001110    |  7         | Z, S, P, CY, AC
-SUB  M      | Subtract memory from A                | 10010110    |  7         | Z, S, P, CY, AC
-SBB  M      | Subtract memory from A with borrow    | 10011110    |  7         | Z, S, P, CY, AC
-ANA  M      | And memory with A                     | 10100110    |  7         | Z, S, P, CY?, AC
-XRA  M      | Exclusive Or memory with A            | 10101110    |  7         | Z, S, P, CY?, AC
-ORA  M      | Or memory with A                      | 10110110    |  7         | Z, S, P, CY?, AC
-CMP  M      | Compare memory with A                 | 10111110    |  7         | Z, S, P, CY, AC
-ADI         | Add immediate to A                    | 11000110    |  7         | Z, S, P, CY, AC
-ACI         | Add immediate to A with carry         | 11001110    |  7         | Z, S, P, CY, AC
-SUI         | Subtract immediate from A             | 11010110    |  7         | Z, S, P, CY, AC
-SBI         | Subtract immediate from A with borrow | 11011110    |  7         | Z, S, P, CY, AC
-ANI         | And immediate with A                  | 11100110    |  7         | 
-XRI         | Exclusive Or immediate with A         | 11101110    |  7         | Z, S, P, CY, AC
-ORI         | Or immediate with A                   | 11110110    |  7         | Z, S, P, CY, AC
-CPI         | Compare immediate with A              | 11111110    |  7         | Z, S, P, CY, AC
-RLC         | Rotate A left                         | 00000111    |  4         | CY
-RRC         | Rotate A right                        | 00001111    |  4         | CY
-RAL         | Rotate A left through carry           | 00010111    |  4         | CY
-RAR         | Route A right through carry           | 00011111    |  4         | CY
-JMP         | Jump unconditional                    | 11000011    | 10         | 
-JC          | Jump on carry                         | 11011010    | 10         | 
-JNC         | Jump on no carry                      | 11010010    | 10         | 
-JZ          | Jump on zero                          | 11001010    | 10         | 
-JNZ         | Jump on no zero                       | 11000010    | 10         | 
-JP          | Jump on positive                      | 11110010    | 10         | 
-JM          | Jump on minus                         | 11111010    | 10         | 
-JPE         | Jump on parity even                   | 11101010    | 10         | 
-JPO         | Jump on parity odd                    | 11100010    | 10         | 
-CALL        | Call unconditional                    | 11001101    | 17         | 
-CC          | Call on carry                         | 11011100    | 11/17      | 
-CNC         | Call on no tarry Call on tern         | 11010100    | 11/17      | 
-CZ          | Call on zero                          | 11001100    | 11/17      | 
-CNZ         | Call on no zero                       | 11000100    | 11/17      | 
-CP          | Call on positive                      | 11110100    | 11/17      | 
-CM          | Call on minus                         | 11111100    | 11/17      | 
-CPE         | Call on parity even                   | 11101100    | 11/17      | 
-CPO         | Call on parity odd                    | 11100100    | 11/17      | 
-RET         | Return                                | 11001001    | 10         | 
-RC          | Return on carry                       | 11011000    | 5/11       | 
-RNC         | Return on no carry                    | 11010000    | 5/11       | 
-RZ          | Return on zero                        | 11001000    | 5/11       | 
-RNZ         | Return on no zero                     | 11000000    | 5/11       | 
-RP          | Return on positive                    | 11110000    | 5/11       | 
-RM          | Return on minus                       | 11111000    | 5/11       | 
-RPE         | Return on parity even                 | 11101000    | 5/11       | 
-RPO         | Return on parity odd                  | 11100000    | 5/11       | 
-RST         | Restart                               | 11AAA111    | 11         | 
-IN          | Input                                 | 11011011    | 10         | 
-OUT         | Output                                | 11010011    | 10         | 
-LXI  B      | Load immediate register Pair B & C    | 00000001    | 10         | 
-LXI  D      | Load immediate register pair D & E    | 00010001    | 10         | 
-LXI  H      | Load immediate register pair H & L    | 00100001    | 10         | 
-LXI  SP     | Load immediate stack pointer          | 00110001    | 10         | 
-PUSH B      | Push register Pair B & C on stack     | 11000101    | 11         | 
-PUSH D      | Push register Pair D & E on stack     | 11010101    | 11         | 
-PUSH H      | Push register Pair H & L on stack     | 11100101    | 11         | 
-PUSH PSW    | Push A and Flags on stack             | 11110001    | 11         | 
-POP  B      | Pop register pair B & C off stack     | 11000001    | 10         | 
-POP  D      | Pop register pair D & E off stack     | 11010001    | 10         | 
-POP  H      | Pop register pair H & L off stick     | 11100001    | 10         | 
-POP  PSW    | Pop A and Flags off stack             | 11110001    | 10         | Z, S, P, CY, AC
-STA         | Store A direct                        | 00110010    | 13         | 
-LDA         | Load A direct                         | 00111010    | 13         | 
-XCHG        | Exchange D & E, H & L Registers       | 11101011    | 4          | 
-XTHL        | Exchange top of stack, H & L          | 11100011    | 18         | 
-SPHL        | H & L to stack pointer                | 11111001    | 5          | 
-PCHL        | H & L to program counter              | 11101001    | 5          | 
-DAD  B      | Add B & C to H & L                    | 00001001    | 10         | CY
-DAD  D      | Add D & E to H & L                    | 00011001    | 10         | CY
-DAD  H      | Add H & L to H & L                    | 00101001    | 10         | CY
-DAD  SP     | Add stack pointer to H & L            | 00111001    | 10         | CY
-STAX B      | Store A indirect                      | 00000010    | 7          | 
-STAX D      | Store A Indirect                      | 00010010    | 7          | 
-LDAX B      | Load A indirect                       | 00001010    | 7          | 
-LDAX D      | Load A indirect                       | 00011010    | 7          | 
-INX  B      | Increment B & C registers             | 00000011    | 5          | 
-INX  D      | Increment D & E registers             | 00010011    | 5          | 
-INX  H      | Increment H & L registers             | 00100011    | 5          | 
-INX  SP     | Increment stack pointer               | 00110011    | 5          | 
-DCX  B      | Decrement B & C                       | 00001011    | 5          | 
-DCX  D      | Decrement D & E                       | 00011011    | 5          | 
-DCX  H      | Decrement H & L                       | 00101011    | 5          | 
-DCX  SP     | Decrement stack pointer               | 00111011    | 5          | 
-CMA         | Complement A                          | 00101111    | 4          | 
-STC         | Set carry                             | 00110111    | 4          | CY
-CMC         | Complement carry                      | 00111111    | 4          | CY
-DAA         | Decimal adjust A                      | 00100111    | 4          | Z, S, P, CY, AC
-SHLD        | Store H & L direct                    | 00100010    | 16         | 
-LHLD        | Load H & L direct                     | 00101010    | 16         | 
-EI          | Enable Interrupts                     | 11111011    | 4          | 
-DI          | Disable Interrupts                    | 11110011    | 4          | 
-NOP         | No operation                          | 00000000    | 4          | 
+MOV  r1, r2 | Move register to register             | 01DDDSSS    | 1  |  5        | 
+MOV  M, r   | Move register to memory               | 01110SSS    | 1  |  7        | 
+MOV  r, M   | Move memory to register               | 01DDD110    | 1  |  7        | 
+HLT         | Halt                                  | 01110110    | 1  |  7        | 
+MVI  r      | Move immediate to register            | 00DDD110    | 2  |  7        | 
+MVI  M      | Move immediate to memory              | 00110110    | 2  | 10        | 
+INR  r      | Increment register                    | 00DDD100    | 1  |  5        | Z, S, P, AC
+DCR  r      | Decrement register                    | 00DDD101    | 1  |  5        | Z, S, P, AC
+INR  M      | Increment memory                      | 00110100    | 1  | 10        | Z, S, P, AC
+DCR  M      | Decrement memory                      | 00110101    | 1  | 10        | Z, S, P, AC
+ADD  r      | Add register to A                     | 10000SSS    | 1  |  4        | Z, S, P, CY, AC
+ADC  r      | Add register to A with carry          | 10001SSS    | 1  |  4        | Z, S, P, CY, AC
+SUB  r      | Subtract register from A              | 10010SSS    | 1  |  4        | Z, S, P, CY, AC
+SBB  r      | Subtract register from A with borrow  | 10011SSS    | 1  |  4        | Z, S, P, CY, AC
+ANA  r      | And register with A                   | 10100SSS    | 1  |  4        | Z, S, P, CY?, AC
+XRA  r      | Exclusive Or register with A          | 10101SSS    | 1  |  4        | Z, S, P, CY?, AC
+ORA  r      | Or register with A                    | 10110SSS    | 1  |  4        | Z, S, P, CY?, AC
+CMP  r      | Compare register with A               | 10111SSS    | 1  |  4        | Z, S, P, CY, AC
+ADD  M      | Add memory to A                       | 10000110    | 1  |  7        | Z, S, P, CY, AC
+ADC  M      | Add memory to A with carry            | 10001110    | 1  |  7        | Z, S, P, CY, AC
+SUB  M      | Subtract memory from A                | 10010110    | 1  |  7        | Z, S, P, CY, AC
+SBB  M      | Subtract memory from A with borrow    | 10011110    | 1  |  7        | Z, S, P, CY, AC
+ANA  M      | And memory with A                     | 10100110    | 1  |  7        | Z, S, P, CY?, AC
+XRA  M      | Exclusive Or memory with A            | 10101110    | 1  |  7        | Z, S, P, CY?, AC
+ORA  M      | Or memory with A                      | 10110110    | 1  |  7        | Z, S, P, CY?, AC
+CMP  M      | Compare memory with A                 | 10111110    | 1  |  7        | Z, S, P, CY, AC
+ADI         | Add immediate to A                    | 11000110    | 2  |  7        | Z, S, P, CY, AC
+ACI         | Add immediate to A with carry         | 11001110    | 2  |  7        | Z, S, P, CY, AC
+SUI         | Subtract immediate from A             | 11010110    | 2  |  7        | Z, S, P, CY, AC
+SBI         | Subtract immediate from A with borrow | 11011110    | 2  |  7        | Z, S, P, CY, AC
+ANI         | And immediate with A                  | 11100110    | 2  |  7        | 
+XRI         | Exclusive Or immediate with A         | 11101110    | 2  |  7        | Z, S, P, CY, AC
+ORI         | Or immediate with A                   | 11110110    | 2  |  7        | Z, S, P, CY, AC
+CPI         | Compare immediate with A              | 11111110    | 2  |  7        | Z, S, P, CY, AC
+RLC         | Rotate A left                         | 00000111    | 1  |  4        | CY
+RRC         | Rotate A right                        | 00001111    | 1  |  4        | CY
+RAL         | Rotate A left through carry           | 00010111    | 1  |  4        | CY
+RAR         | Route A right through carry           | 00011111    | 1  |  4        | CY
+JMP         | Jump unconditional                    | 11000011    | 3  | 10        | 
+JC          | Jump on carry                         | 11011010    | 3  | 10        | 
+JNC         | Jump on no carry                      | 11010010    | 3  | 10        | 
+JZ          | Jump on zero                          | 11001010    | 3  | 10        | 
+JNZ         | Jump on no zero                       | 11000010    | 3  | 10        | 
+JP          | Jump on positive                      | 11110010    | 3  | 10        | 
+JM          | Jump on minus                         | 11111010    | 3  | 10        | 
+JPE         | Jump on parity even                   | 11101010    | 3  | 10        | 
+JPO         | Jump on parity odd                    | 11100010    | 3  | 10        | 
+CALL        | Call unconditional                    | 11001101    | 3  | 17        | 
+CC          | Call on carry                         | 11011100    | 3  | 11/17     | 
+CNC         | Call on no tarry Call on tern         | 11010100    | 3  | 11/17     | 
+CZ          | Call on zero                          | 11001100    | 3  | 11/17     | 
+CNZ         | Call on no zero                       | 11000100    | 3  | 11/17     | 
+CP          | Call on positive                      | 11110100    | 3  | 11/17     | 
+CM          | Call on minus                         | 11111100    | 3  | 11/17     | 
+CPE         | Call on parity even                   | 11101100    | 3  | 11/17     | 
+CPO         | Call on parity odd                    | 11100100    | 3  | 11/17     | 
+RET         | Return                                | 11001001    | 1  | 10        | 
+RC          | Return on carry                       | 11011000    | 1  | 5/11      | 
+RNC         | Return on no carry                    | 11010000    | 1  | 5/11      | 
+RZ          | Return on zero                        | 11001000    | 1  | 5/11      | 
+RNZ         | Return on no zero                     | 11000000    | 1  | 5/11      | 
+RP          | Return on positive                    | 11110000    | 1  | 5/11      | 
+RM          | Return on minus                       | 11111000    | 1  | 5/11      | 
+RPE         | Return on parity even                 | 11101000    | 1  | 5/11      | 
+RPO         | Return on parity odd                  | 11100000    | 1  | 5/11      | 
+RST         | Restart                               | 11AAA111    | 1  | 11        | 
+IN          | Input                                 | 11011011    | 2  | 10        | 
+OUT         | Output                                | 11010011    | 2  | 10        | 
+LXI  B      | Load immediate register Pair B & C    | 00000001    | 3  | 10        | 
+LXI  D      | Load immediate register pair D & E    | 00010001    | 3  | 10        | 
+LXI  H      | Load immediate register pair H & L    | 00100001    | 3  | 10        | 
+LXI  SP     | Load immediate stack pointer          | 00110001    | 3  | 10        | 
+PUSH B      | Push register Pair B & C on stack     | 11000101    | 1  | 11        | 
+PUSH D      | Push register Pair D & E on stack     | 11010101    | 1  | 11        | 
+PUSH H      | Push register Pair H & L on stack     | 11100101    | 1  | 11        | 
+PUSH PSW    | Push A and Flags on stack             | 11110001    | 1  | 11        | 
+POP  B      | Pop register pair B & C off stack     | 11000001    | 1  | 10        | 
+POP  D      | Pop register pair D & E off stack     | 11010001    | 1  | 10        | 
+POP  H      | Pop register pair H & L off stick     | 11100001    | 1  | 10        | 
+POP  PSW    | Pop A and Flags off stack             | 11110001    | 1  | 10        | Z, S, P, CY, AC
+STA         | Store A direct                        | 00110010    | 3  | 13        | 
+LDA         | Load A direct                         | 00111010    | 3  | 13        | 
+XCHG        | Exchange D & E, H & L Registers       | 11101011    | 1  | 4         | 
+XTHL        | Exchange top of stack, H & L          | 11100011    | 1  | 18        | 
+SPHL        | H & L to stack pointer                | 11111001    | 1  | 5         | 
+PCHL        | H & L to program counter              | 11101001    | 0  | 5         | 
+DAD  B      | Add B & C to H & L                    | 00001001    | 1  | 10        | CY
+DAD  D      | Add D & E to H & L                    | 00011001    | 1  | 10        | CY
+DAD  H      | Add H & L to H & L                    | 00101001    | 1  | 10        | CY
+DAD  SP     | Add stack pointer to H & L            | 00111001    | 1  | 10        | CY
+STAX B      | Store A indirect                      | 00000010    | 1  | 7         | 
+STAX D      | Store A Indirect                      | 00010010    | 1  | 7         | 
+LDAX B      | Load A indirect                       | 00001010    | 1  | 7         | 
+LDAX D      | Load A indirect                       | 00011010    | 1  | 7         | 
+INX  B      | Increment B & C registers             | 00000011    | 1  | 5         | 
+INX  D      | Increment D & E registers             | 00010011    | 1  | 5         | 
+INX  H      | Increment H & L registers             | 00100011    | 1  | 5         | 
+INX  SP     | Increment stack pointer               | 00110011    | 1  | 5         | 
+DCX  B      | Decrement B & C                       | 00001011    | 1  | 5         | 
+DCX  D      | Decrement D & E                       | 00011011    | 1  | 5         | 
+DCX  H      | Decrement H & L                       | 00101011    | 1  | 5         | 
+DCX  SP     | Decrement stack pointer               | 00111011    | 1  | 5         | 
+CMA         | Complement A                          | 00101111    | 1  | 4         | 
+STC         | Set carry                             | 00110111    | 1  | 4         | CY
+CMC         | Complement carry                      | 00111111    | 1  | 4         | CY
+DAA         | Decimal adjust A                      | 00100111    | 1  | 4         | Z, S, P, CY, AC
+SHLD        | Store H & L direct                    | 00100010    | 3  | 16        | 
+LHLD        | Load H & L direct                     | 00101010    | 3  | 16        | 
+EI          | Enable Interrupts                     | 11111011    | 1  | 4         | 
+DI          | Disable Interrupts                    | 11110011    | 1  | 4         | 
+NOP         | No operation                          | 00000000    | 1  | 4         | 

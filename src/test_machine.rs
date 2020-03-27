@@ -59,12 +59,10 @@ pub fn load_rom(memory: &mut [u8]) {
 }
 
 pub fn main_loop(debug: bool) {
-    let state = I8080State::new();
     let mut memory = [0; 0x4000];
     load_rom(&mut memory);
 
     let _io = interpreter::start(
-        state,
         TestDevices,
         TestMemory { memory: memory.clone(), },
         &[0x0],

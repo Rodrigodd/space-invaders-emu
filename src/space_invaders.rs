@@ -1,10 +1,10 @@
 use std::sync::Arc;
 use std::sync::atomic::{ AtomicU8, Ordering };
 
-use intel8080::{ IODevices, I8080State, Memory };
+use intel8080::{ IODevices, Memory };
 use intel8080::interpreter;
 
-use std::time::{ Duration };
+use std::time::{ Duration, Instant };
 use std::thread;
 
 use winit::{
@@ -139,8 +139,7 @@ pub fn main_loop(debug: bool) {
         (0b0000_1000).into(),
         (0b0000_0000).into(),
     ]);
-
-    let state = I8080State::new();
+    
     use std::mem;
     let mut memory = [0; 0x4000];
     load_rom(&mut memory);
@@ -149,24 +148,29 @@ pub fn main_loop(debug: bool) {
     });
 
     let mut interpreter_io = interpreter::start(
-        state,
         SpaceInvadersDevices::new(ports.clone()),
         SpaceInvadersMemory { memory: memory.clone(), },
         &[0x0u16, 0x8, 0x10],
         debug,
     );
+    let mut clock = Instant::now();
 
     event_loop.run(move |event, _, control_flow| {
         *control_flow = ControlFlow::Poll;
 
         match event {
             Event::RedrawRequested(window_id) if window_id == window.id() => {
+                let elapsed = clock.elapsed();
+                clock = Instant::now();
+                if elapsed.as_micros() < 16666 {
+                    thread::sleep(Duration::from_micros(16666) - elapsed);
+                }
                 render_screen(pixels.get_frame(), &memory[0x2400..]);
                 pixels.render();
                 interpreter_io.interrupt(0b11010111); // RST 2 (0xd7)
                 thread::sleep(Duration::from_millis(8));
                 interpreter_io.interrupt(0b11001111); // RST 1 (0xcf)
-            },
+            }
             Event::MainEventsCleared => window.request_redraw(),
             Event::WindowEvent {
                 event,
