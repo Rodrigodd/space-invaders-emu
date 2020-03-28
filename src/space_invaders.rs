@@ -1,40 +1,103 @@
-use std::sync::Arc;
-use std::sync::atomic::{ AtomicU8, Ordering };
+use std::sync::{
+    atomic::{ AtomicU8, Ordering },
+    Arc
+};
 
-use intel8080::{ IODevices, Memory };
-use intel8080::interpreter;
+use intel8080::{interpreter,  IODevices, Memory };
 
-use std::time::{ Duration, Instant };
-use std::thread;
+use std::{
+    io::Cursor,
+    thread,
+    time::{ Duration, Instant }
+};
 
 use winit::{
     event::{Event, WindowEvent, KeyboardInput, ElementState, VirtualKeyCode},
     event_loop::{ControlFlow, EventLoop},
     dpi::{LogicalPosition, LogicalSize, PhysicalSize},
 };
+
 use pixels::{Pixels, SurfaceTexture};
+
+use rodio;
+use rodio::Source;
 
 const SCREEN_WIDTH: u32 = 224;
 const SCREEN_HEIGHT: u32 = 256;
 
+static SOUND_BANK: [&'static [u8]; 9] = [
+    include_bytes!("../sound/0.wav"),
+    include_bytes!("../sound/1.wav"),
+    include_bytes!("../sound/2.wav"),
+    include_bytes!("../sound/3.wav"),
+    include_bytes!("../sound/4.wav"),
+    include_bytes!("../sound/5.wav"),
+    include_bytes!("../sound/6.wav"),
+    include_bytes!("../sound/7.wav"),
+    include_bytes!("../sound/8.wav"),
+];
+
 struct SpaceInvadersDevices {
     shift_register: u16,
     shift_amount: u8,
-    ports: Arc<[AtomicU8; 3]>,
+    read_ports: Arc<[AtomicU8; 3]>,
+
+    wport3: u8,
+    wport5: u8,
+    ufo: rodio::Sink,
+    device: Option<rodio::Device>,
 }
 impl SpaceInvadersDevices {
     fn new(ports: Arc<[AtomicU8; 3]>) -> Self {
+        
         Self {
             shift_register:0,
             shift_amount: 0,
-            ports
+            read_ports: ports,
+
+            wport3: 0,
+            wport5: 0,
+            ufo: rodio::Sink::new_idle().0,
+            device: None,
         }
+    }
+
+    fn get_device<'a>(&'a mut self) -> &'a rodio::Device {
+        if let Some(ref device) = self.device {
+            device
+        } else {
+            let device = rodio::default_output_device().unwrap();
+            self.device = Some(device);
+            self.ufo = rodio::Sink::new(self.device.as_ref().unwrap());
+            self.device.as_ref().unwrap()
+        }
+    }
+
+    fn start_ufo(&mut self) {
+        self.ufo.append(
+            rodio::Decoder::new(Cursor::new(SOUND_BANK[0])).unwrap()
+                .repeat_infinite()
+        );
+        self.ufo.play();
+    }
+    fn stop_ufo(&mut self) {
+        self.ufo.stop();
+    }
+
+    fn play_sound(&mut self, index: u8) {
+        println!("play {}!", index);
+        rodio::play_raw(
+            self.get_device(),
+            rodio::Decoder::new(
+                Cursor::new(SOUND_BANK[index as usize])
+            ).unwrap().convert_samples()
+        );
     }
 }
 impl IODevices for SpaceInvadersDevices {
     fn read(&mut self, device: u8) -> u8 {
         match device {
-            i @ 0..=2 => self.ports[i as usize].load(Ordering::Relaxed),
+            i @ 0..=2 => self.read_ports[i as usize].load(Ordering::Relaxed),
             3 => (self.shift_register >> (8 - self.shift_amount)) as u8,
             _ => 0
         }
@@ -43,7 +106,47 @@ impl IODevices for SpaceInvadersDevices {
     fn write(&mut self, device: u8, value: u8) {
         match device {
             2 => self.shift_amount = value & 0b111,
+            3 => { // sound
+                let check_bit = |byte: u8, i: u8| byte & (0b1 << i) != 0;
+
+                if check_bit(value, 0) && !check_bit(self.wport3, 0) {
+                    self.start_ufo();
+                } else if !check_bit(value, 0) && check_bit(self.wport3, 0) {
+                    self.stop_ufo();
+                }
+
+                if check_bit(value, 1) && !check_bit(self.wport3, 1) {
+                    self.play_sound(1);
+                }
+                if check_bit(value, 2) && !check_bit(self.wport3, 2) {
+                    self.play_sound(2);
+                }
+                if check_bit(value, 3) && !check_bit(self.wport3, 3) {
+                    self.play_sound(3);
+                }
+                self.wport3 = value;
+            }
             4 => self.shift_register = (self.shift_register >> 8) | ((value as u16) << 8),
+            5 => { // sound
+                let check_bit = |byte: u8, i: u8| byte & (0b1 << i) != 0;
+
+                if check_bit(value, 0) && !check_bit(self.wport3, 0) {
+                    self.play_sound(4);
+                }
+                if check_bit(value, 1) && !check_bit(self.wport3, 1) {
+                    self.play_sound(5);
+                }
+                if check_bit(value, 2) && !check_bit(self.wport3, 2) {
+                    self.play_sound(6);
+                }
+                if check_bit(value, 3) && !check_bit(self.wport3, 3) {
+                    self.play_sound(7);
+                }
+                if check_bit(value, 4) && !check_bit(self.wport3, 4) {
+                    self.play_sound(8);
+                }
+                self.wport5 = value;
+            }
             _ => (),
         };
     }
