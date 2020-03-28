@@ -15,3 +15,7 @@ winit = "0.22"
 pixels = "0.0.2"
 array-init = "0.1"
 intel8080 = { version = "0.1.0", path = "intel8080" }
+
+[features]
+
+debug = ["intel8080/debug"]

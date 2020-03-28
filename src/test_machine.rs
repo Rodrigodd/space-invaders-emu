@@ -1,4 +1,4 @@
-use intel8080::{ IODevices, I8080State, Memory };
+use intel8080::{ IODevices, Memory };
 use crate::interpreter;
 
 struct TestDevices;

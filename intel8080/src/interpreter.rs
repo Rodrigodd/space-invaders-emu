@@ -1,13 +1,18 @@
-use crate::write_adapter::WriteAdapter;
 use crate::intel8080::{ I8080State, IODevices, Memory };
-use crate::dissasembler::dissasembly_around;
-use crate::dissasembler;
 
 use std::sync::mpsc::{ channel, Sender, Receiver };
 use std::time::{ Instant, Duration };
 use std::thread;
-use std::io;
-use std::fmt::Write;
+
+#[cfg(feature = "debug")]
+use {
+    crate::write_adapter::WriteAdapter,
+    crate::dissasembler::dissasembly_around,
+    std::collections::HashSet,
+    std::fmt::Write,
+    crate::dissasembler,
+    std::io,
+};
 
 macro_rules! as_expr {
     ($x:expr) => { $x };
@@ -225,8 +230,10 @@ macro_rules! ops {
 
 
 /// Start the interpreter in a new thread. Return a I8080IO for communication.
-/// entries is a list of entries for the dissasembler. The first entry is the
+/// 'entries' is a list of entries for the dissasembler. The first entry is the
 /// initial value of the Program Counter (PC).
+/// 'debug' tells if the interpreter starts in debug mode. Debug mode only exist
+/// when the feature "debug" is enabled.
 pub fn start<I: 'static + IODevices, M: 'static + Memory>(
     devices: I,
     memory: M,
@@ -239,7 +246,6 @@ pub fn start<I: 'static + IODevices, M: 'static + Memory>(
 
     let interface = InterpreterInterface {
         channel: send,
-        debug_mode: true
     };
     
     let interpreter = Interpreter::new(memory, devices);
@@ -257,13 +263,13 @@ const TARGET_FREQ: u64 = 2_000_000; //Hz
 
 pub struct InterpreterInterface {
     channel: Sender<Message>,
-    debug_mode: bool,
 }
 impl InterpreterInterface {
+
+    #[cfg(feature = "debug")]
     /// Toogle the debug mode of the interpreter.
     /// Return false if the interpreter is not running.
     pub fn toogle_debug_mode(&mut self) -> bool {
-        self.debug_mode = true;
         self.channel.send(Message::Debug).is_ok()
     }
 
@@ -273,11 +279,13 @@ impl InterpreterInterface {
 }
 
 pub enum Message {
+    #[cfg(feature = "debug")]
     Debug,
     /// send a interrupt, which make the processor execute a opcode. Normally a RST.
     Interrupt(u8),
 }
 
+#[cfg(feature = "debug")]
 #[derive(PartialEq)]
 enum State {
     Debugging,
@@ -359,7 +367,7 @@ impl<M: Memory, I: IODevices> Interpreter<M,I> {
                 let delay = expected_instant.duration_since(now);
                 if delay.as_millis() > 0 { // Windows only offer milliseconds precision
                     thread::sleep(delay);
-                    println!("sync: {:5} us after {} clocks", delay.as_micros(), self.clock_from_last_sync);
+                    // println!("sync: {:5} us after {} clocks", delay.as_micros(), self.clock_from_last_sync);
                 }
             }
             if self.clock_count > 0x8fff_ffff_ffff_ffff {
@@ -369,88 +377,107 @@ impl<M: Memory, I: IODevices> Interpreter<M,I> {
         }
     }
 
-    pub fn run(mut self, entries: &[u16], debug: bool, machine: Receiver<Message>) {
-        use std::collections::HashSet;
+    pub fn run(mut self, entries: &[u16], _debug: bool, machine: Receiver<Message>) {
+        #[cfg(feature = "debug")]
         let mut breakpoints = HashSet::new();
-
+        #[cfg(feature = "debug")]
+        let mut interpreter_state = if _debug { State::Debugging } else { State::Running };
+        #[cfg(feature = "debug")]
         let traced = dissasembler::trace(&self.memory.get_rom(), entries);
+        #[cfg(feature = "debug")]
         let stdout = io::stdout();
-        let mut interpreter_state = if debug { State::Debugging } else { State::Running };
 
         self.state.set_PC(entries[0]);
         let mut interrupt = 0x20; // 0x20 indicates that there is no interrupt set up.
 
         'main_loop: loop {
-            if interpreter_state == State::Debugging {
-                let mut w = WriteAdapter(io::BufWriter::new(stdout.lock()));
-                writeln!(w).unwrap();
-                dissasembly_around(&mut w, &traced, &self.memory.get_rom(), self.state.get_PC()).unwrap();
-                writeln!(w).unwrap();
-                self.state.print_state(&mut w);
-                drop(w);
-                loop {
-                    let mut input = String::new();
-                    io::stdin().read_line(&mut input).unwrap();
-                    let mut input = input.trim().split_ascii_whitespace().filter(|s| !s.trim().is_empty());
-                    if let Some(command) = input.next() {
-                        if command.starts_with("runto") {
-                            if let Some(adress) = input.next() {
-                                if let Ok(adress) = u16::from_str_radix(adress, 16) {
-                                    let mut safety = 0;
-                                    while self.state.get_PC() != adress {
-                                        safety += 1;
-                                        if safety > 100_000 {
-                                            println!("safety: after 100_000 steps, it don't reach the adress {:04x} yet", adress);
-                                            break;
+            #[cfg(feature = "debug")] {
+                if interpreter_state == State::Debugging {
+                    let mut w = WriteAdapter(io::BufWriter::new(stdout.lock()));
+                    writeln!(w).unwrap();
+                    dissasembly_around(&mut w, &traced, &self.memory.get_rom(), self.state.get_PC()).unwrap();
+                    writeln!(w).unwrap();
+                    self.state.print_state(&mut w);
+                    drop(w);
+                    loop {
+                        let mut input = String::new();
+                        io::stdin().read_line(&mut input).unwrap();
+                        let mut input = input.trim().split_ascii_whitespace().filter(|s| !s.trim().is_empty());
+                        if let Some(command) = input.next() {
+                            if command.starts_with("runto") {
+                                if let Some(adress) = input.next() {
+                                    if let Ok(adress) = u16::from_str_radix(adress, 16) {
+                                        let mut safety = 0;
+                                        while self.state.get_PC() != adress {
+                                            safety += 1;
+                                            if safety > 100_000 {
+                                                println!("safety: after 100_000 steps, it don't reach the adress {:04x} yet", adress);
+                                                break;
+                                            }
+                                            let opcode = self.memory.read(self.state.get_PC());
+                                            let (offset, _) = Self::get_opcode_size_and_clock(opcode);
+                                            self.state.set_PC(self.state.get_PC() + offset as u16);
+                                            self.interpret_opcode(opcode);
                                         }
-                                        let opcode = self.memory.read(self.state.get_PC());
-                                        let (offset, clock) = Self::get_opcode_size_and_clock(opcode);
-                                        self.state.set_PC(self.state.get_PC() + offset as u16);
-                                        self.interpret_opcode(opcode);
-                                    }
-                                    continue 'main_loop;
-                                } else { println!("error: invalid adress"); }
-                            } else {
-                                println!("use 'runto <ADRESS>', where <ADRESS> is the hexadecimal adress of the opcode it will stop when reached.");
+                                        continue 'main_loop;
+                                    } else { println!("error: invalid adress"); }
+                                } else {
+                                    println!("use 'runto <ADRESS>', where <ADRESS> is the hexadecimal adress of the opcode it will stop when reached.");
+                                }
+                            } else if command.starts_with("interrupt") {
+                                if let Some(opcode) = input.next() {
+                                    if let Ok(opcode) = u8::from_str_radix(opcode, 16) {
+                                        interrupt = opcode;
+                                        break;
+                                    } else { println!("error: invalid opcode"); }
+                                } else {
+                                    println!("use 'interrupt <OPCODE>', where <OPCODE> is the hexadecimal that opcode will be run.");
+                                }
+                            } else if command.starts_with("run") {
+                                interpreter_state = State::Running;
+                                self.set_sync_ref();
+                                break;
+                            } else if command.starts_with("bp") {
+                                if let Some(adress) = input.next() {
+                                    if let Ok(adress) = u16::from_str_radix(adress, 16) {
+                                        breakpoints.insert(adress);
+                                        continue 'main_loop;
+                                    } else { println!("error: invalid adress"); }
+                                } else {
+                                    println!("use 'bp <ADRESS>', where <ADRESS> is the hexadecimal adress of the opcode it will break when reached.");
+                                }
                             }
-                        } else if command.starts_with("interrupt") {
-                            if let Some(opcode) = input.next() {
-                                if let Ok(opcode) = u8::from_str_radix(opcode, 16) {
-                                    interrupt = opcode;
-                                    break;
-                                } else { println!("error: invalid opcode"); }
-                            } else {
-                                println!("use 'interrupt <OPCODE>', where <OPCODE> is the hexadecimal that opcode will be run.");
-                            }
-                        } else if command.starts_with("run") {
-                            interpreter_state = State::Running;
-                            self.set_sync_ref();
-                            break;
-                        } else if command.starts_with("bp") {
-                            if let Some(adress) = input.next() {
-                                if let Ok(adress) = u16::from_str_radix(adress, 16) {
-                                    breakpoints.insert(adress);
-                                    continue 'main_loop;
-                                } else { println!("error: invalid adress"); }
-                            } else {
-                                println!("use 'bp <ADRESS>', where <ADRESS> is the hexadecimal adress of the opcode it will break when reached.");
-                            }
+                        } else {
+                            break; // do one step
                         }
-                    } else {
-                        break; // do one step
                     }
                 }
             }
             use std::sync::mpsc::TryRecvError;
             
-            match interpreter_state {
-                State::Debugging => loop { match machine.try_recv() {
-                    Ok(Message::Debug) => interpreter_state = State::Running,
-                    Err(TryRecvError::Disconnected) => break 'main_loop,
-                    _ => break,
-                }}
-                State::Running => loop { match machine.try_recv() {
-                    Ok(Message::Debug) => interpreter_state = State::Debugging,
+            #[cfg(feature = "debug")] {
+                match interpreter_state {
+                    State::Debugging => loop { match machine.try_recv() {
+                        Ok(Message::Debug) => interpreter_state = State::Running,
+                        Err(TryRecvError::Disconnected) => break 'main_loop,
+                        _ => break,
+                    }}
+                    State::Running => loop { match machine.try_recv() {
+                        Ok(Message::Debug) => interpreter_state = State::Debugging,
+                        Ok(Message::Interrupt(op)) => {
+                            if interrupt != 0x20 {
+                                println!("interrupt {:02x} ovewrite by {:02x}", interrupt, op);
+                            }
+                            interrupt = op
+                        },
+                        Err(TryRecvError::Disconnected) => break 'main_loop,
+                        _ => break,
+                    }}
+                }
+            }
+            #[cfg(not(feature = "debug"))]
+            loop { 
+                match machine.try_recv() {
                     Ok(Message::Interrupt(op)) => {
                         if interrupt != 0x20 {
                             println!("interrupt {:02x} ovewrite by {:02x}", interrupt, op);
@@ -459,9 +486,9 @@ impl<M: Memory, I: IODevices> Interpreter<M,I> {
                     },
                     Err(TryRecvError::Disconnected) => break 'main_loop,
                     _ => break,
-                }}
+                }
             }
-            
+
             if interrupt != 0x20 {
                 // println!("Interrupt! {}", interrupt);
                 if self.state.interrupt_enabled {
@@ -481,9 +508,11 @@ impl<M: Memory, I: IODevices> Interpreter<M,I> {
                     self.state.set_PC(self.state.get_PC() + offset as u16);
                     self.interpret_opcode(opcode);
 
-                    if breakpoints.contains(&self.state.get_PC()) {
-                        interpreter_state = State::Debugging;
-                        break;
+                    #[cfg(feature = "debug")] {
+                        if breakpoints.contains(&self.state.get_PC()) {
+                            interpreter_state = State::Debugging;
+                            break;
+                        }
                     }
                 }
                 self.sync();

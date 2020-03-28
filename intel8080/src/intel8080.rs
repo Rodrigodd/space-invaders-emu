@@ -9,6 +9,7 @@ pub trait Memory : Send {
 
     fn get_rom(&mut self) -> Vec<u8>;
 
+    #[inline]
     fn read_u16(&self, adress: u16) -> u16 {
         u16::from_le_bytes(
             [self.read(adress), self.read(adress + 1)]
@@ -50,70 +51,73 @@ impl I8080State {
         }
     }
 
+    #[inline]
     pub fn get_PSW(&self) -> u16 {
         unsafe {  u16::from_be(*(&self.A as *const u8 as *const u16)) }
     }
+    #[inline]
     pub fn set_PSW(&mut self, value: u16) {
         unsafe { *(&mut self.A as *mut u8 as *mut u16) = value.to_be(); }
     }
 
+    #[inline]
     pub fn get_BC(&self) -> u16 {
         unsafe {  u16::from_be(*(&self.B as *const u8 as *const u16)) }
     }
+    #[inline]
     pub fn set_BC(&mut self, value: u16) {
         unsafe { *(&mut self.B as *mut u8 as *mut u16) = value.to_be(); }
     }
 
+    #[inline]
     pub fn get_DE(&self) -> u16 {
         unsafe {  u16::from_be(*(&self.D as *const u8 as *const u16)) }
     }
+    #[inline]
     pub fn set_DE(&mut self, value: u16) {
         unsafe { *(&mut self.D as *mut u8 as *mut u16) = value.to_be(); }
     }
 
+    #[inline]
     pub fn get_HL(&self) -> u16 {
         unsafe {  u16::from_be(*(&self.H as *const u8 as *const u16)) }
     }
+    #[inline]
     pub fn set_HL(&mut self, value: u16) {
         unsafe { *(&mut self.H as *mut u8 as *mut u16) = value.to_be(); }
     }
 
+    #[inline]
     pub fn get_SP(&self) -> u16 {
         u16::from_le(self.SP)
     }
+    #[inline]
     pub fn set_SP(&mut self, value: u16) {
         self.SP = value.to_le();
     }
-
+    #[inline]
     pub fn get_PC(&self) -> u16 {
         u16::from_le(self.PC)
     }
+    #[inline]
     pub fn set_PC(&mut self, value: u16) {
         self.PC = value.to_le();
-        // if self.PC > 0x1a90 {
-        //     println!("Program Counter escaped the program!!");
-        // }
     }
-
+    #[inline]
     pub fn push_stack<M: Memory>(&mut self, value: u16, memory: &mut M) {
         memory.write(self.get_SP() - 2, (value.to_le() & 0xff) as u8);
         memory.write(self.get_SP() - 1, ((value.to_le() >> 8) & 0xff) as u8);
         self.SP = (u16::from_le(self.SP) - 2).to_le();
-        // if self.get_SP() <= 0x2000 {
-        //     println!("STACK OVERFLOW!");
-        // }
     }
+    #[inline]
     pub fn pop_stack<M: Memory>(&mut self, memory: &M) -> u16 {
         self.SP = (u16::from_le(self.SP) + 2).to_le();
-        // if self.get_SP() > 0x2400 {
-        //     println!("STACK UNDERFLOW!?");
-        // }
-        
         memory.read(self.get_SP() - 2) as u16 |
         (memory.read(self.get_SP() - 1) as u16) << 8
         
     }
 
+    #[inline]
     /// set all flags
     pub fn set_flags(&mut self, result: u8, carry: bool, auxcarry: bool) {
         self.Flags = 0b0000_0010
@@ -124,6 +128,7 @@ impl I8080State {
             | (result & 0b1000_0000); // sign
     }
 
+    #[inline]
     /// set all flags except carry
     pub fn set_flags_ex(&mut self, result: u8, auxcarry: bool) {
         self.Flags = 0b0000_0010
@@ -134,26 +139,32 @@ impl I8080State {
             | (result & 0b1000_0000); // sign
     }
 
+    #[inline]
     pub fn set_carry(&mut self, carry: bool) {
         self.Flags = (self.Flags & !1) | carry as u8;
     }
 
+    #[inline]
     pub fn on_aux_carry(&self) -> bool {
         (self.Flags & 0b0001_0000) != 0
     }
 
+    #[inline]
     pub fn on_carry(&self) -> bool {
         (self.Flags & 0b0000_0001) != 0
     }
 
+    #[inline]
     pub fn on_zero(&self) -> bool {
         (self.Flags & 0b0100_0000) != 0
     }
 
+    #[inline]
     pub fn on_positive(&self) -> bool {
         (self.Flags & 0b1000_0000) == 0
     }
 
+    #[inline]
     pub fn on_parity_even(&self) -> bool {
         (self.Flags & 0b0000_0100) != 0
     }

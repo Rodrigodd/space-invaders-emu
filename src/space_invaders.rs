@@ -53,6 +53,7 @@ struct SpaceInvadersMemory {
     memory: Arc<[AtomicU8; 0x4000]>
 }
 impl Memory for SpaceInvadersMemory {
+    #[inline]
     fn read(&self, mut adress: u16) -> u8 {
         if adress > 0x4000 {
             adress = (adress % 0x2000) + 0x2000;
@@ -60,6 +61,7 @@ impl Memory for SpaceInvadersMemory {
         if (adress as usize) < self.memory.len() {
             self.memory[adress as usize].load(Ordering::Relaxed)
         } else {
+            #[cfg(feature = "debug")]
             println!("Reading out of memory! At {:04x}!", adress);
             0
         }
@@ -73,9 +75,11 @@ impl Memory for SpaceInvadersMemory {
             if adress >= 0x2000 { // adress < 0x2000 is ROM
                 self.memory[adress as usize].store(value, Ordering::Relaxed);
             } else {
+                #[cfg(feature = "debug")]
                 println!("Writing to ROM?");
             }
         } else {
+            #[cfg(feature = "debug")]
             println!("Writing out of memory! At {:04x}!", adress);
         }
     }
@@ -187,6 +191,7 @@ pub fn main_loop(debug: bool) {
                     VirtualKeyCode::Z      => { ports[1].fetch_or(0b0001_0000, Ordering::Relaxed); }, // P1 SHOOT
                     VirtualKeyCode::C      => { ports[1].fetch_or(0b0000_0001, Ordering::Relaxed); }, // COIN
                     VirtualKeyCode::Return => { ports[1].fetch_or(0b0000_0100, Ordering::Relaxed); }, // P1 START
+                    #[cfg(feature = "debug")]
                     VirtualKeyCode::Escape => if !interpreter_io.toogle_debug_mode() {
                         *control_flow = ControlFlow::Exit;
                     },
