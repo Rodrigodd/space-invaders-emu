@@ -1,9 +1,5 @@
 use crate::intel8080::{ I8080State, IODevices, Memory };
 
-use std::sync::mpsc::{ channel, Sender, Receiver };
-use std::time::{ Instant, Duration };
-use std::thread;
-
 #[cfg(feature = "debug")]
 use {
     crate::write_adapter::WriteAdapter,
@@ -229,61 +225,7 @@ macro_rules! ops {
 }
 
 
-/// Start the interpreter in a new thread. Return a I8080IO for communication.
-/// 'entries' is a list of entries for the dissasembler. The first entry is the
-/// initial value of the Program Counter (PC).
-/// 'debug' tells if the interpreter starts in debug mode. Debug mode only exist
-/// when the feature "debug" is enabled.
-pub fn start<I: 'static + IODevices, M: 'static + Memory>(
-    devices: I,
-    memory: M,
-    entries: &'static [u16],
-    debug: bool,
-) -> InterpreterInterface {
-    
-
-    let (send, recv) = channel();
-
-    let interface = InterpreterInterface {
-        channel: send,
-    };
-    
-    let interpreter = Interpreter::new(memory, devices);
-
-    thread::Builder::new()
-        .name("Intel 8080 Interpreter".to_string())
-        .spawn(move || interpreter.run(entries, debug, recv))
-        .unwrap();
-
-    interface
-}
-
-const TARGET_FREQ: u64 = 2_000_000; //Hz
-
-
-pub struct InterpreterInterface {
-    channel: Sender<Message>,
-}
-impl InterpreterInterface {
-
-    #[cfg(feature = "debug")]
-    /// Toogle the debug mode of the interpreter.
-    /// Return false if the interpreter is not running.
-    pub fn toogle_debug_mode(&mut self) -> bool {
-        self.channel.send(Message::Debug).is_ok()
-    }
-
-    pub fn interrupt(&mut self, opcode: u8) -> bool {
-        self.channel.send(Message::Interrupt(opcode)).is_ok()
-    }
-}
-
-pub enum Message {
-    #[cfg(feature = "debug")]
-    Debug,
-    /// send a interrupt, which make the processor execute a opcode. Normally a RST.
-    Interrupt(u8),
-}
+// const TARGET_FREQ: u64 = 2_000_000; //Hz
 
 #[cfg(feature = "debug")]
 #[derive(PartialEq)]
@@ -293,23 +235,34 @@ enum State {
 }
 
 
-struct Interpreter<M: Memory, I: IODevices> {
+pub struct Interpreter<M: Memory, I: IODevices> {
     state: I8080State,
-    memory: M,
     devices: I,
-    clock_count: u64,
-    clock_from_last_sync: u32,
-    sync_ref: Instant,
+    memory: M,
+    clock_count: u32,
+    target_clock: u32,
 }
 impl<M: Memory, I: IODevices> Interpreter<M,I> {
-    pub fn new(memory: M, devices: I) -> Self {
+    pub fn new(devices: I, memory: M, entries: &[u16]) -> Self {
+        #[cfg(feature = "debug")]
+        let mut breakpoints = HashSet::new();
+        #[cfg(feature = "debug")]
+        let mut interpreter_state = if _debug { State::Debugging } else { State::Running };
+        #[cfg(feature = "debug")]
+        let traced = dissasembler::trace(&self.memory.get_rom(), entries);
+        #[cfg(feature = "debug")]
+        let stdout = io::stdout();
+
+        let mut state = I8080State::new();
+
+        state.set_PC(entries[0]);
+
         Self {
-            state: I8080State::new(),
-            memory,
+            state,
             devices,
+            memory,
             clock_count: 0,
-            clock_from_last_sync: 0,
-            sync_ref: Instant::now(),
+            target_clock: 0,
         }
     }
 
@@ -351,46 +304,10 @@ impl<M: Memory, I: IODevices> Interpreter<M,I> {
         SIZE_AND_CLOCKS[opcode as usize]
     }
 
-    fn set_sync_ref(&mut self) {
-        println!("RESYNCING!");
-        self.sync_ref = Instant::now();
-        self.clock_count = 0;
-    }
-
-    fn sync(&mut self) {
-        if self.clock_from_last_sync > 2048 {
-            self.clock_count += self.clock_from_last_sync as u64;
-            // 2.0 MHz => 1s/2*10^6 clock => 1*10^6us/2*10^6 clock => 0.5 us/clock
-            let expected_instant = self.sync_ref + Duration::from_micros(self.clock_count as u64 * 1_000_000 / TARGET_FREQ);
-            let now = Instant::now();
-            if expected_instant > now {
-                let delay = expected_instant.duration_since(now);
-                if delay.as_millis() > 0 { // Windows only offer milliseconds precision
-                    thread::sleep(delay);
-                    // println!("sync: {:5} us after {} clocks", delay.as_micros(), self.clock_from_last_sync);
-                }
-            }
-            if self.clock_count > 0x8fff_ffff_ffff_ffff {
-                self.set_sync_ref();
-            }
-            self.clock_from_last_sync = 0;
-        }
-    }
-
-    pub fn run(mut self, entries: &[u16], _debug: bool, machine: Receiver<Message>) {
-        #[cfg(feature = "debug")]
-        let mut breakpoints = HashSet::new();
-        #[cfg(feature = "debug")]
-        let mut interpreter_state = if _debug { State::Debugging } else { State::Running };
-        #[cfg(feature = "debug")]
-        let traced = dissasembler::trace(&self.memory.get_rom(), entries);
-        #[cfg(feature = "debug")]
-        let stdout = io::stdout();
-
-        self.state.set_PC(entries[0]);
-        let mut interrupt = 0x20; // 0x20 indicates that there is no interrupt set up.
-
-        'main_loop: loop {
+    /// run for 'number_of_clocks' clocks
+    pub fn run(&mut self, number_of_clocks: u32) {
+        self.target_clock += number_of_clocks;
+        while self.clock_count < self.target_clock {
             #[cfg(feature = "debug")] {
                 if interpreter_state == State::Debugging {
                     let mut w = WriteAdapter(io::BufWriter::new(stdout.lock()));
@@ -453,71 +370,40 @@ impl<M: Memory, I: IODevices> Interpreter<M,I> {
                     }
                 }
             }
-            use std::sync::mpsc::TryRecvError;
             
+            
+            let opcode = self.memory.read(self.state.get_PC());
+            let (offset, clock) = Self::get_opcode_size_and_clock(opcode);
+            self.state.set_PC(self.state.get_PC() + offset as u16);
+            self.clock_count += clock as u32;
+            self.interpret_opcode(opcode);
+
             #[cfg(feature = "debug")] {
-                match interpreter_state {
-                    State::Debugging => loop { match machine.try_recv() {
-                        Ok(Message::Debug) => interpreter_state = State::Running,
-                        Err(TryRecvError::Disconnected) => break 'main_loop,
-                        _ => break,
-                    }}
-                    State::Running => loop { match machine.try_recv() {
-                        Ok(Message::Debug) => interpreter_state = State::Debugging,
-                        Ok(Message::Interrupt(op)) => {
-                            if interrupt != 0x20 {
-                                println!("interrupt {:02x} ovewrite by {:02x}", interrupt, op);
-                            }
-                            interrupt = op
-                        },
-                        Err(TryRecvError::Disconnected) => break 'main_loop,
-                        _ => break,
-                    }}
+                if breakpoints.contains(&self.state.get_PC()) {
+                    interpreter_state = State::Debugging;
+                    break;
                 }
             }
-            #[cfg(not(feature = "debug"))]
-            loop { 
-                match machine.try_recv() {
-                    Ok(Message::Interrupt(op)) => {
-                        if interrupt != 0x20 {
-                            println!("interrupt {:02x} ovewrite by {:02x}", interrupt, op);
-                        }
-                        interrupt = op
-                    },
-                    Err(TryRecvError::Disconnected) => break 'main_loop,
-                    _ => break,
-                }
-            }
-
-            if interrupt != 0x20 {
-                // println!("Interrupt! {}", interrupt);
-                if self.state.interrupt_enabled {
-                    self.state.interrupt_enabled = false;
-                    let (_, clock) = Self::get_opcode_size_and_clock(interrupt);
-                    self.clock_from_last_sync += clock as u32;
-                    self.interpret_opcode(interrupt);
-                } else {
-                    println!("interrupt {:02x} ignored", interrupt);
-                }
-                interrupt = 0x20;
-            } else {
-                for _ in 0..10 {
-                    let opcode = self.memory.read(self.state.get_PC());
-                    let (offset, clock) = Self::get_opcode_size_and_clock(opcode);
-                    self.clock_from_last_sync += clock as u32;
-                    self.state.set_PC(self.state.get_PC() + offset as u16);
-                    self.interpret_opcode(opcode);
-
-                    #[cfg(feature = "debug")] {
-                        if breakpoints.contains(&self.state.get_PC()) {
-                            interpreter_state = State::Debugging;
-                            break;
-                        }
-                    }
-                }
-                self.sync();
-            };
         }
+    }
+
+    /// block the current thread, running the interpreter forever. 
+    /// (But you can stop it using std::process::exit in some DeviceIO)
+    #[inline]
+    pub fn run_forever(&mut self) -> ! {
+        loop {
+            let opcode = self.memory.read(self.state.get_PC());
+            let (offset, clock) = Self::get_opcode_size_and_clock(opcode);
+            self.state.set_PC(self.state.get_PC() + offset as u16);
+            self.clock_count += clock as u32;
+            self.interpret_opcode(opcode);
+        }
+    }
+
+    pub fn interrupt(&mut self, opcode: u8) {
+        let (_, clock) = Self::get_opcode_size_and_clock(opcode);
+        self.clock_count += clock as u32;
+        self.interpret_opcode(opcode);
     }
 
     #[allow(non_snake_case)]
@@ -891,12 +777,10 @@ impl<M: Memory, I: IODevices> Interpreter<M,I> {
                 self.state.set_PC(adress as u16);
             },
             0b11011011 => { // IN         | Input                                | 11011011        | 10   
-                self.sync();
                 let device = self.memory.read(self.state.get_PC()-1);
                 self.state.A = self.devices.read(device);
             },
             0b11010011 => { // OUT        | Output                               | 11010011        | 10   
-                self.sync();
                 let device = self.memory.read(self.state.get_PC()-1);
                 self.devices.write(device, self.state.A);
             },

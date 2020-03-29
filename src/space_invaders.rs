@@ -1,6 +1,7 @@
 use std::sync::{
     atomic::{ AtomicU8, Ordering },
-    Arc
+    Arc,
+    mpsc::{channel, Sender},
 };
 
 use intel8080::{interpreter,  IODevices, Memory };
@@ -37,6 +38,12 @@ static SOUND_BANK: [&'static [u8]; 9] = [
     include_bytes!("../sound/8.wav"),
 ];
 
+enum AudioMessage {
+    Play(u8),
+    StartUfo,
+    StopUfo,
+}
+
 struct SpaceInvadersDevices {
     shift_register: u16,
     shift_amount: u8,
@@ -44,11 +51,43 @@ struct SpaceInvadersDevices {
 
     wport3: u8,
     wport5: u8,
-    ufo: rodio::Sink,
-    device: Option<rodio::Device>,
+    audio_channel: Sender<AudioMessage>,
 }
 impl SpaceInvadersDevices {
     fn new(ports: Arc<[AtomicU8; 3]>) -> Self {
+
+        let (sx, rx) = channel();
+
+        thread::spawn(move || {
+            let device = rodio::default_output_device().unwrap();
+            let ufo = rodio::Sink::new(&device);
+            ufo.pause();
+            ufo.append(
+                rodio::Decoder::new(Cursor::new(SOUND_BANK[0])).unwrap()
+                    .repeat_infinite()
+            );
+
+            while let Ok(msg) = rx.recv() {
+                match msg {
+                    AudioMessage::Play(index) => {
+                        rodio::play_raw(
+                            &device,
+                            rodio::Decoder::new(
+                                Cursor::new(SOUND_BANK[index as usize])
+                            ).unwrap().convert_samples()
+                        );
+                    },
+                    AudioMessage::StartUfo => {
+                        println!(" >>> Start Ufo!");
+                        ufo.play();
+                    },
+                    AudioMessage::StopUfo => {
+                        println!("Stop Ufo");
+                        ufo.pause();
+                    },
+                }
+            }
+        });
         
         Self {
             shift_register:0,
@@ -57,41 +96,19 @@ impl SpaceInvadersDevices {
 
             wport3: 0,
             wport5: 0,
-            ufo: rodio::Sink::new_idle().0,
-            device: None,
-        }
-    }
-
-    fn get_device<'a>(&'a mut self) -> &'a rodio::Device {
-        if let Some(ref device) = self.device {
-            device
-        } else {
-            let device = rodio::default_output_device().unwrap();
-            self.device = Some(device);
-            self.ufo = rodio::Sink::new(self.device.as_ref().unwrap());
-            self.device.as_ref().unwrap()
+            audio_channel: sx,
         }
     }
 
     fn start_ufo(&mut self) {
-        self.ufo.append(
-            rodio::Decoder::new(Cursor::new(SOUND_BANK[0])).unwrap()
-                .repeat_infinite()
-        );
-        self.ufo.play();
+        self.audio_channel.send(AudioMessage::StartUfo).unwrap();
     }
     fn stop_ufo(&mut self) {
-        self.ufo.stop();
+        self.audio_channel.send(AudioMessage::StopUfo).unwrap();
     }
 
     fn play_sound(&mut self, index: u8) {
-        println!("play {}!", index);
-        rodio::play_raw(
-            self.get_device(),
-            rodio::Decoder::new(
-                Cursor::new(SOUND_BANK[index as usize])
-            ).unwrap().convert_samples()
-        );
+        self.audio_channel.send(AudioMessage::Play(index)).unwrap();
     }
 }
 impl IODevices for SpaceInvadersDevices {
@@ -254,11 +271,11 @@ pub fn main_loop(debug: bool) {
         mem::transmute::<_, [AtomicU8; 0x4000]>(memory)
     });
 
-    let mut interpreter_io = interpreter::start(
+    let mut interpreter = interpreter::Interpreter::new(
         SpaceInvadersDevices::new(ports.clone()),
         SpaceInvadersMemory { memory: memory.clone(), },
         &[0x0u16, 0x8, 0x10],
-        debug,
+        // debug,
     );
     let mut clock = Instant::now();
 
@@ -269,14 +286,17 @@ pub fn main_loop(debug: bool) {
             Event::RedrawRequested(window_id) if window_id == window.id() => {
                 let elapsed = clock.elapsed();
                 clock = Instant::now();
-                if elapsed.as_micros() < 16666 {
-                    thread::sleep(Duration::from_micros(16666) - elapsed);
-                }
+                println!("elapsed: {} us", elapsed.as_micros());
+                // clock = Instant::now();
+                // if elapsed.as_micros() < 16666 {
+                //     thread::sleep(Duration::from_micros(16666) - elapsed);
+                // }
                 render_screen(pixels.get_frame(), &memory[0x2400..]);
                 pixels.render();
-                interpreter_io.interrupt(0b11010111); // RST 2 (0xd7)
-                thread::sleep(Duration::from_millis(8));
-                interpreter_io.interrupt(0b11001111); // RST 1 (0xcf)
+                interpreter.run(2_000_000/120);
+                interpreter.interrupt(0b11010111); // RST 2 (0xd7)
+                interpreter.run(2_000_000/120);
+                interpreter.interrupt(0b11001111); // RST 1 (0xcf)
             }
             Event::MainEventsCleared => window.request_redraw(),
             Event::WindowEvent {
@@ -295,7 +315,7 @@ pub fn main_loop(debug: bool) {
                     VirtualKeyCode::C      => { ports[1].fetch_or(0b0000_0001, Ordering::Relaxed); }, // COIN
                     VirtualKeyCode::Return => { ports[1].fetch_or(0b0000_0100, Ordering::Relaxed); }, // P1 START
                     #[cfg(feature = "debug")]
-                    VirtualKeyCode::Escape => if !interpreter_io.toogle_debug_mode() {
+                    VirtualKeyCode::Escape => if !interpreter.toogle_debug_mode() {
                         *control_flow = ControlFlow::Exit;
                     },
                     _ => (),

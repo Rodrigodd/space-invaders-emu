@@ -62,12 +62,12 @@ pub fn main_loop(debug: bool) {
     let mut memory = [0; 0x4000];
     load_rom(&mut memory);
 
-    let _io = interpreter::start(
+    let mut interpreter = interpreter::Interpreter::new(
         TestDevices,
         TestMemory { memory: memory.clone(), },
         &[0x0],
-        debug
+        // debug
     );
 
-    loop {}
+    interpreter.run_forever();
 }
