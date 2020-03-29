@@ -1,5 +1,6 @@
 {
     "lldb.displayFormat": "hex",
     "lldb.dereferencePointers": true,
-    "lldb.showDisassembly": "auto"
+    "lldb.showDisassembly": "auto",
+    "rust.all_features": true
 }

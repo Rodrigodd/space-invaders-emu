@@ -9,7 +9,6 @@ use intel8080::{interpreter,  IODevices, Memory };
 use std::{
     io::Cursor,
     thread,
-    time::{ Duration, Instant }
 };
 
 use winit::{
@@ -277,20 +276,17 @@ pub fn main_loop(debug: bool) {
         &[0x0u16, 0x8, 0x10],
         // debug,
     );
-    let mut clock = Instant::now();
+    #[cfg(feature = "debug")] {
+        if debug {
+            interpreter.enter_debug_mode();
+        }
+    }
 
     event_loop.run(move |event, _, control_flow| {
         *control_flow = ControlFlow::Poll;
 
         match event {
             Event::RedrawRequested(window_id) if window_id == window.id() => {
-                let elapsed = clock.elapsed();
-                clock = Instant::now();
-                println!("elapsed: {} us", elapsed.as_micros());
-                // clock = Instant::now();
-                // if elapsed.as_micros() < 16666 {
-                //     thread::sleep(Duration::from_micros(16666) - elapsed);
-                // }
                 render_screen(pixels.get_frame(), &memory[0x2400..]);
                 pixels.render();
                 interpreter.run(2_000_000/120);
@@ -315,9 +311,7 @@ pub fn main_loop(debug: bool) {
                     VirtualKeyCode::C      => { ports[1].fetch_or(0b0000_0001, Ordering::Relaxed); }, // COIN
                     VirtualKeyCode::Return => { ports[1].fetch_or(0b0000_0100, Ordering::Relaxed); }, // P1 START
                     #[cfg(feature = "debug")]
-                    VirtualKeyCode::Escape => if !interpreter.toogle_debug_mode() {
-                        *control_flow = ControlFlow::Exit;
-                    },
+                    VirtualKeyCode::Escape => interpreter.enter_debug_mode(),
                     _ => (),
                 },
                 WindowEvent::KeyboardInput {

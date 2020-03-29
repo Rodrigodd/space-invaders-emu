@@ -4,10 +4,11 @@ use crate::intel8080::{ I8080State, IODevices, Memory };
 use {
     crate::write_adapter::WriteAdapter,
     crate::dissasembler::dissasembly_around,
+    crate::dissasembler,
     std::collections::HashSet,
     std::fmt::Write,
-    crate::dissasembler,
     std::io,
+    std::ops::Range,
 };
 
 macro_rules! as_expr {
@@ -227,13 +228,6 @@ macro_rules! ops {
 
 // const TARGET_FREQ: u64 = 2_000_000; //Hz
 
-#[cfg(feature = "debug")]
-#[derive(PartialEq)]
-enum State {
-    Debugging,
-    Running,
-}
-
 
 pub struct Interpreter<M: Memory, I: IODevices> {
     state: I8080State,
@@ -241,29 +235,39 @@ pub struct Interpreter<M: Memory, I: IODevices> {
     memory: M,
     clock_count: u32,
     target_clock: u32,
+    #[cfg(feature = "debug")]
+    debug: bool,
+    #[cfg(feature = "debug")]
+    breakpoints: HashSet<u16>,
+    #[cfg(feature = "debug")]
+    traced: Vec<Range<u16>>,
 }
 impl<M: Memory, I: IODevices> Interpreter<M,I> {
-    pub fn new(devices: I, memory: M, entries: &[u16]) -> Self {
-        #[cfg(feature = "debug")]
-        let mut breakpoints = HashSet::new();
-        #[cfg(feature = "debug")]
-        let mut interpreter_state = if _debug { State::Debugging } else { State::Running };
-        #[cfg(feature = "debug")]
-        let traced = dissasembler::trace(&self.memory.get_rom(), entries);
-        #[cfg(feature = "debug")]
-        let stdout = io::stdout();
+    pub fn new(devices: I, mut memory: M, entries: &[u16]) -> Self {
 
         let mut state = I8080State::new();
 
         state.set_PC(entries[0]);
 
         Self {
+            #[cfg(feature = "debug")]
+            debug: false,
+            #[cfg(feature = "debug")]
+            breakpoints: HashSet::new(),
+            #[cfg(feature = "debug")]
+            traced: dissasembler::trace(&memory.get_rom(), entries),
+
             state,
             devices,
             memory,
             clock_count: 0,
             target_clock: 0,
         }
+    }
+
+    #[cfg(feature = "debug")]
+    pub fn enter_debug_mode(&mut self) {
+        self.debug = true;
     }
 
     fn get_opcode_size_and_clock(opcode: u8) -> (u8, u8) {
@@ -309,10 +313,11 @@ impl<M: Memory, I: IODevices> Interpreter<M,I> {
         self.target_clock += number_of_clocks;
         while self.clock_count < self.target_clock {
             #[cfg(feature = "debug")] {
-                if interpreter_state == State::Debugging {
+                if self.debug {
+                    let stdout = std::io::stdout();
                     let mut w = WriteAdapter(io::BufWriter::new(stdout.lock()));
                     writeln!(w).unwrap();
-                    dissasembly_around(&mut w, &traced, &self.memory.get_rom(), self.state.get_PC()).unwrap();
+                    dissasembly_around(&mut w, &self.traced, &self.memory.get_rom(), self.state.get_PC()).unwrap();
                     writeln!(w).unwrap();
                     self.state.print_state(&mut w);
                     drop(w);
@@ -332,11 +337,11 @@ impl<M: Memory, I: IODevices> Interpreter<M,I> {
                                                 break;
                                             }
                                             let opcode = self.memory.read(self.state.get_PC());
-                                            let (offset, _) = Self::get_opcode_size_and_clock(opcode);
+                                            let (offset, clock) = Self::get_opcode_size_and_clock(opcode);
+                                            self.clock_count += clock as u32;
                                             self.state.set_PC(self.state.get_PC() + offset as u16);
                                             self.interpret_opcode(opcode);
                                         }
-                                        continue 'main_loop;
                                     } else { println!("error: invalid adress"); }
                                 } else {
                                     println!("use 'runto <ADRESS>', where <ADRESS> is the hexadecimal adress of the opcode it will stop when reached.");
@@ -344,21 +349,19 @@ impl<M: Memory, I: IODevices> Interpreter<M,I> {
                             } else if command.starts_with("interrupt") {
                                 if let Some(opcode) = input.next() {
                                     if let Ok(opcode) = u8::from_str_radix(opcode, 16) {
-                                        interrupt = opcode;
+                                        self.interrupt(opcode);
                                         break;
                                     } else { println!("error: invalid opcode"); }
                                 } else {
                                     println!("use 'interrupt <OPCODE>', where <OPCODE> is the hexadecimal that opcode will be run.");
                                 }
                             } else if command.starts_with("run") {
-                                interpreter_state = State::Running;
-                                self.set_sync_ref();
+                                self.debug = false;
                                 break;
                             } else if command.starts_with("bp") {
                                 if let Some(adress) = input.next() {
                                     if let Ok(adress) = u16::from_str_radix(adress, 16) {
-                                        breakpoints.insert(adress);
-                                        continue 'main_loop;
+                                        self.breakpoints.insert(adress);
                                     } else { println!("error: invalid adress"); }
                                 } else {
                                     println!("use 'bp <ADRESS>', where <ADRESS> is the hexadecimal adress of the opcode it will break when reached.");
@@ -379,9 +382,8 @@ impl<M: Memory, I: IODevices> Interpreter<M,I> {
             self.interpret_opcode(opcode);
 
             #[cfg(feature = "debug")] {
-                if breakpoints.contains(&self.state.get_PC()) {
-                    interpreter_state = State::Debugging;
-                    break;
+                if self.breakpoints.contains(&self.state.get_PC()) {
+                    self.enter_debug_mode();
                 }
             }
         }

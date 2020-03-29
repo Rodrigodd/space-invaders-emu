@@ -68,6 +68,12 @@ pub fn main_loop(debug: bool) {
         &[0x0],
         // debug
     );
+    
+    #[cfg(feature = "debug")] {
+        if debug {
+            interpreter.enter_debug_mode();
+        }
+    }
 
     interpreter.run_forever();
 }
