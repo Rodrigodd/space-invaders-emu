@@ -1131,6 +1131,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "space-invaders-wasm"
+version = "0.1.0"
+dependencies = [
+ "intel8080",
+ "wasm-bindgen",
+]
+
+[[package]]
 name = "spirv_cross"
 version = "0.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"

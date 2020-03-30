@@ -1,0 +1,140 @@
+<html>
+
+<head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+    <link rel="icon"
+        href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAChklEQVR4Xu2aLW8VQRSGn9sS0pCGL0EQBIMpGBpEDSgEAgO48gcIhkAdAomoo00N4Q8UByQEgUCBqSBgWkxNU0EQfAlCSNs0J+GGuadzd2d2Z7t3mTNyds7Hvuc9Z2fmbI/MRy/z98cAMAZkjoClQOYEsCJoKWApkDkClgKZE8C+AilSYAqYVUyaB34nZtcEcF/pfAp8qmMnBQDXgWfKiWPA9zqOeWSPAt/U/A3geR07BkAd9P7KZs+AK8ATBeQ0IJTtj6/Az0iwDwPHHRlJqQ9Kxy3gdaTegeUpUsBnX5w94jyYAxYiHb0HPHJkfihQI9X5lxsASWDcq8QYkFMKXAIeKhLI3Lgztw5sRrLtFHDGkdkG3iodDzxzUWZS1ADfZzDKiRqLR3YjVOOdokQNgDa2wpeB006cLgB3VNyWgT/O3AxwNiq2sAasODIHgZtKxxLw3pnbAN7E2KlSA+Twca3EiD4MySboboxjwCIgm6H+8B2GtMoXgNSk4GEABEP1b6ExIKcUCMm7CiTaV5HCy5myGmAAeK6h9jV8CYwZA4ruJ6ukgN58+DZCCQIXpCLEl+QM0PvvUToMRd9PVmGAAaAOIMYAT2PkHbAVlMXhiw4AF9XyEDa2UgPa6gyNTA0wAFrqDRoDYhu1ZZ/BMXX7IzXoC/DLKUaHgBOqOL0EJgvq2ypwVT1/BZwrkJFeg77sCPFFbol2huktAyC8Rg+u1I0RrecjIP1Dd0jf73yBwU63xgwAhcB/zwD5lUV+aRk2PgOP1cPbwMkCGfnlRn69STqaqgFJnWxSmQHQJLpd0G0M6EKUmvTRGNAkul3QbQzoQpSa9NEY0CS6XdBtDOhClJr0MXsG7ALeGrRB5mAHsAAAAABJRU5ErkJggg==" />
+    <style>
+        @font-face {
+            font-family: 'Space Invaders';
+            src: url('font/Space-Invaders.woff2') format('woff2'),
+                url('font/Space-Invaders.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        canvas {
+            image-rendering: -moz-crisp-edges;
+            image-rendering: -webkit-crisp-edges;
+            image-rendering: pixelated;
+        }
+
+        .page {
+            width: 448px;
+            margin: 0;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            -ms-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%);
+        }
+
+        .screen {
+            width: 448px;
+            height: 512px;
+            padding: 5px;
+        }
+
+        body {
+            background-image: url('artwork/backdrop_moon_midway.png');
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: cover;
+
+            font-family: 'Space Invaders', monospace;
+            font-size: 8px;
+            line-height: 12px;
+            color: white;
+            background-color: black;
+        }
+
+        .bottom-left {
+            position: absolute;
+            bottom: 5px;
+        }
+
+        .bottom-right {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+        }
+
+        a {
+            color: #00ff00;
+        }
+        a:hover {
+            color: #ff0000;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bottom-left">
+        <p>PRESS 'C' TO INSERT COINS</p>
+        <p>'BACKSPACE': IS 2PLAYER BUTTON</p>
+        <p>'ENTER': 1PLAYER BUTTON</p>
+        <p>ARROWS MOVE THE SHIP</p>
+        <p>'Z': FIRE BUTTOn</p>
+    </div>
+    <div class="bottom-right">
+        By <a href="https://github.com/Rodrigodd">Rodrigodd</a></p>
+    </div>
+    <div class='page'>
+        <div class='screen'>
+            <canvas id='canvas' width='224' height='256'
+                style='transform: scale(2); transform-origin: top left'></canvas>
+        </div>
+    </div>
+    <script type="module">
+        import init, { run_frame, key_down, key_up } from './pkg/space_invaders_wasm.js';
+
+        async function run() {
+            await init();
+
+            const WIDTH = 224;
+            const HEIGHT = 256;
+
+            const canvas = document.getElementById("canvas");
+            const ctx = canvas.getContext("2d");
+            ctx.fillStyle = "black";
+            ctx.fillRect(0, 0, WIDTH, HEIGHT);
+
+            function updateDisplay(offset) {
+                const imageData = ctx.createImageData(WIDTH, HEIGHT);
+                let screen = run_frame();
+                for (let i = 0; i < WIDTH * HEIGHT * 4; i++) {
+                    imageData.data[i] = screen[i];
+                }
+                ctx.putImageData(imageData, 0, 0);
+            };
+
+            let count = 0;
+            function runLoop() {
+                updateDisplay(count);
+                count += 1;
+                window.requestAnimationFrame(runLoop);
+            }
+            window.requestAnimationFrame(runLoop);
+
+            const translateKeys = {
+                37: 1, // P1 LEFT
+                39: 2, // P1 RIGHT
+                90: 3, // P1 SHOOT
+                67: 4, // COIN
+                13: 5, // P1 START
+                8: 6, // P2 START
+            };
+
+            document.addEventListener("keydown", event => {
+                key_down(translateKeys[event.keyCode]);
+            });
+
+            document.addEventListener("keyup", event => {
+                key_up(translateKeys[event.keyCode]);
+            });
+        }
+        run();
+    </script>
+</body>
+
+</html>

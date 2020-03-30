@@ -8,15 +8,16 @@ edition = "2018"
 
 [workspace]
 
-members = ["intel8080"]
-
-[dependencies]
-winit = "0.22"
-pixels = "0.0.2"
-array-init = "0.1"
-intel8080 = { version = "0.1.0", path = "intel8080" }
-rodio = "0.11"
+members = ["intel8080", "space-invaders-wasm"]
 
 [features]
 
 debug = ["intel8080/debug"]
+
+[dependencies]
+intel8080 = { version = "0.1.0", path = "intel8080" }
+array-init = "0.1"
+
+pixels = "0.0.2"
+winit = "0.22"
+rodio = "0.11"

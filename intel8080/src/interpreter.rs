@@ -231,8 +231,8 @@ macro_rules! ops {
 
 pub struct Interpreter<M: Memory, I: IODevices> {
     state: I8080State,
-    devices: I,
-    memory: M,
+    pub devices: I,
+    pub memory: M,
     clock_count: u32,
     target_clock: u32,
     #[cfg(feature = "debug")]
@@ -250,6 +250,7 @@ impl<M: Memory, I: IODevices> Interpreter<M,I> {
         state.set_PC(entries[0]);
 
         Self {
+            
             #[cfg(feature = "debug")]
             debug: false,
             #[cfg(feature = "debug")]
