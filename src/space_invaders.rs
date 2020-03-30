@@ -75,11 +75,9 @@ impl SpaceInvadersDevices {
                         );
                     },
                     AudioMessage::StartUfo => {
-                        println!(" >>> Start Ufo!");
                         ufo.play();
                     },
                     AudioMessage::StopUfo => {
-                        println!("Stop Ufo");
                         ufo.pause();
                     },
                 }
@@ -299,11 +297,21 @@ pub fn main_loop(debug: bool) {
                     is_synthetic: false,
                     .. 
                 }  => match key { // PRESSED
-                    VirtualKeyCode::Left   => { interpreter.devices.read_ports[1] |= 0b0010_0000; }, // P1 LEFT
-                    VirtualKeyCode::Right  => { interpreter.devices.read_ports[1] |= 0b0100_0000; }, // P1 RIGHT },
-                    VirtualKeyCode::Z      => { interpreter.devices.read_ports[1] |= 0b0001_0000; }, // P1 SHOOT
-                    VirtualKeyCode::C      => { interpreter.devices.read_ports[1] |= 0b0000_0001; }, // COIN
+                    VirtualKeyCode::Left => { // LEFT
+                        interpreter.devices.read_ports[1] |= 0b0010_0000; // P1
+                        interpreter.devices.read_ports[2] |= 0b0010_0000; // P2
+                    },
+                    VirtualKeyCode::Right => { // RIGHT
+                        interpreter.devices.read_ports[1] |= 0b0100_0000; // P1
+                        interpreter.devices.read_ports[2] |= 0b0100_0000; // P2
+                    },
+                    VirtualKeyCode::Z => { // SHOOT
+                        interpreter.devices.read_ports[1] |= 0b0001_0000; // P1
+                        interpreter.devices.read_ports[2] |= 0b0001_0000; // P2
+                    },
+                    VirtualKeyCode::C => { interpreter.devices.read_ports[1] |= 0b0000_0001; }, // COIN
                     VirtualKeyCode::Return => { interpreter.devices.read_ports[1] |= 0b0000_0100; }, // P1 START
+                    VirtualKeyCode::Back => { interpreter.devices.read_ports[1] |= 0b0000_0010; }, // P2 START
                     #[cfg(feature = "debug")]
                     VirtualKeyCode::Escape => interpreter.enter_debug_mode(),
                     _ => (),
@@ -313,11 +321,21 @@ pub fn main_loop(debug: bool) {
                     is_synthetic: false,
                     .. 
                 } => match key { // RELEASED
-                    VirtualKeyCode::Left   => { interpreter.devices.read_ports[1] &= !0b0010_0000; }, // P1 LEFT
-                    VirtualKeyCode::Right  => { interpreter.devices.read_ports[1] &= !0b0100_0000; }, // P1 RIGHT 
-                    VirtualKeyCode::Z      => { interpreter.devices.read_ports[1] &= !0b0001_0000; }, // P1 SHOOT
-                    VirtualKeyCode::C      => { interpreter.devices.read_ports[1] &= !0b0000_0001; }, // COIN
+                    VirtualKeyCode::Left => { // LEFT
+                        interpreter.devices.read_ports[1] &= !0b0010_0000; // P1
+                        interpreter.devices.read_ports[2] &= !0b0010_0000; // P2
+                    },
+                    VirtualKeyCode::Right => { // RIGHT
+                        interpreter.devices.read_ports[1] &= !0b0100_0000; // P1
+                        interpreter.devices.read_ports[2] &= !0b0100_0000; // P2
+                    },
+                    VirtualKeyCode::Z => { // SHOOT
+                        interpreter.devices.read_ports[1] &= !0b0001_0000; // P1
+                        interpreter.devices.read_ports[2] &= !0b0001_0000; // P2
+                    },
+                    VirtualKeyCode::C => { interpreter.devices.read_ports[1] &= !0b0000_0001; }, // COIN
                     VirtualKeyCode::Return => { interpreter.devices.read_ports[1] &= !0b0000_0100; }, // P1 START
+                    VirtualKeyCode::Back => { interpreter.devices.read_ports[1] &= !0b0000_0010; }, // P2 START
                     _ => (),
                 },
                 _ => ()
