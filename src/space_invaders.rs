@@ -1,6 +1,4 @@
 use std::sync::{
-    atomic::{ AtomicU8, Ordering },
-    Arc,
     mpsc::{channel, Sender},
 };
 
@@ -46,14 +44,14 @@ enum AudioMessage {
 struct SpaceInvadersDevices {
     shift_register: u16,
     shift_amount: u8,
-    read_ports: Arc<[AtomicU8; 3]>,
+    read_ports: [u8; 3],
 
     wport3: u8,
     wport5: u8,
     audio_channel: Sender<AudioMessage>,
 }
 impl SpaceInvadersDevices {
-    fn new(ports: Arc<[AtomicU8; 3]>) -> Self {
+    fn new(ports: [u8; 3]) -> Self {
 
         let (sx, rx) = channel();
 
@@ -113,7 +111,7 @@ impl SpaceInvadersDevices {
 impl IODevices for SpaceInvadersDevices {
     fn read(&mut self, device: u8) -> u8 {
         match device {
-            i @ 0..=2 => self.read_ports[i as usize].load(Ordering::Relaxed),
+            i @ 0..=2 => self.read_ports[i as usize],
             3 => (self.shift_register >> (8 - self.shift_amount)) as u8,
             _ => 0
         }
@@ -169,7 +167,7 @@ impl IODevices for SpaceInvadersDevices {
 }
 
 struct SpaceInvadersMemory {
-    memory: Arc<[AtomicU8; 0x4000]>
+    memory: [u8; 0x4000]
 }
 impl Memory for SpaceInvadersMemory {
     #[inline]
@@ -178,7 +176,7 @@ impl Memory for SpaceInvadersMemory {
             adress = (adress % 0x2000) + 0x2000;
         }
         if (adress as usize) < self.memory.len() {
-            self.memory[adress as usize].load(Ordering::Relaxed)
+            self.memory[adress as usize]
         } else {
             #[cfg(feature = "debug")]
             println!("Reading out of memory! At {:04x}!", adress);
@@ -192,7 +190,7 @@ impl Memory for SpaceInvadersMemory {
         }
         if (adress as usize) < self.memory.len() {
             if adress >= 0x2000 { // adress < 0x2000 is ROM
-                self.memory[adress as usize].store(value, Ordering::Relaxed);
+                self.memory[adress as usize] = value;
             } else {
                 #[cfg(feature = "debug")]
                 println!("Writing to ROM?");
@@ -206,7 +204,7 @@ impl Memory for SpaceInvadersMemory {
     fn get_rom(&mut self) -> Vec<u8> {
         let mut rom = Vec::with_capacity(0x2000);
         for i in 0..0x2000 {
-            rom.push(self.memory[i].load(Ordering::Relaxed));
+            rom.push(self.memory[i]);
         }
         rom
     }
@@ -223,7 +221,7 @@ pub fn load_rom(buf: &mut [u8]) {
     }
 }
 
-fn render_screen(screen: &mut [u8], memory: &[AtomicU8]) {
+fn render_screen(screen: &mut [u8], memory: &[u8]) {
     for x in 0..SCREEN_WIDTH {
         for y in 0..SCREEN_HEIGHT {
             let i = (x*SCREEN_HEIGHT + y) as usize;
@@ -231,7 +229,7 @@ fn render_screen(screen: &mut [u8], memory: &[AtomicU8]) {
                 println!("x: {}, y: {}, i: {}, i/8: {}, memory.len(): {}", x, y, i, i/8, memory.len());
                 return;
             }
-            let m = memory[i/8].load(Ordering::Relaxed);
+            let m = memory[i/8];
             let c = if (m >> (i%8)) & 0x1 != 0 { 0xff } else { 0x0 };
             let p = ((SCREEN_HEIGHT - y - 1)*SCREEN_WIDTH + x) as usize*4;
             screen[p]     = if y >= 72 || (y < 16 && (x < 16 || x >= 102))                         { c } else { 0 };
@@ -257,22 +255,18 @@ pub fn main_loop(debug: bool) {
 
     let mut pixels = Pixels::new(SCREEN_WIDTH, SCREEN_HEIGHT, surface_texture).unwrap();
 
-    let ports = Arc::new([
+    let ports = [
         (0b0000_1111).into(),
         (0b0000_1000).into(),
         (0b0000_0000).into(),
-    ]);
+    ];
     
-    use std::mem;
     let mut memory = [0; 0x4000];
     load_rom(&mut memory);
-    let memory: Arc<[AtomicU8; 0x4000]> = Arc::new(unsafe {
-        mem::transmute::<_, [AtomicU8; 0x4000]>(memory)
-    });
 
     let mut interpreter = interpreter::Interpreter::new(
-        SpaceInvadersDevices::new(ports.clone()),
-        SpaceInvadersMemory { memory: memory.clone(), },
+        SpaceInvadersDevices::new(ports),
+        SpaceInvadersMemory { memory: memory, },
         &[0x0u16, 0x8, 0x10],
         // debug,
     );
@@ -287,7 +281,7 @@ pub fn main_loop(debug: bool) {
 
         match event {
             Event::RedrawRequested(window_id) if window_id == window.id() => {
-                render_screen(pixels.get_frame(), &memory[0x2400..]);
+                render_screen(pixels.get_frame(), &interpreter.memory.memory[0x2400..]);
                 pixels.render();
                 interpreter.run(2_000_000/120);
                 interpreter.interrupt(0b11010111); // RST 2 (0xd7)
@@ -305,11 +299,11 @@ pub fn main_loop(debug: bool) {
                     is_synthetic: false,
                     .. 
                 }  => match key { // PRESSED
-                    VirtualKeyCode::Left   => { ports[1].fetch_or(0b0010_0000, Ordering::Relaxed); }, // P1 LEFT
-                    VirtualKeyCode::Right  => { ports[1].fetch_or(0b0100_0000, Ordering::Relaxed); }, // P1 RIGHT },
-                    VirtualKeyCode::Z      => { ports[1].fetch_or(0b0001_0000, Ordering::Relaxed); }, // P1 SHOOT
-                    VirtualKeyCode::C      => { ports[1].fetch_or(0b0000_0001, Ordering::Relaxed); }, // COIN
-                    VirtualKeyCode::Return => { ports[1].fetch_or(0b0000_0100, Ordering::Relaxed); }, // P1 START
+                    VirtualKeyCode::Left   => { interpreter.devices.read_ports[1] |= 0b0010_0000; }, // P1 LEFT
+                    VirtualKeyCode::Right  => { interpreter.devices.read_ports[1] |= 0b0100_0000; }, // P1 RIGHT },
+                    VirtualKeyCode::Z      => { interpreter.devices.read_ports[1] |= 0b0001_0000; }, // P1 SHOOT
+                    VirtualKeyCode::C      => { interpreter.devices.read_ports[1] |= 0b0000_0001; }, // COIN
+                    VirtualKeyCode::Return => { interpreter.devices.read_ports[1] |= 0b0000_0100; }, // P1 START
                     #[cfg(feature = "debug")]
                     VirtualKeyCode::Escape => interpreter.enter_debug_mode(),
                     _ => (),
@@ -319,11 +313,11 @@ pub fn main_loop(debug: bool) {
                     is_synthetic: false,
                     .. 
                 } => match key { // RELEASED
-                    VirtualKeyCode::Left   => { ports[1].fetch_and(!0b0010_0000, Ordering::Relaxed); }, // P1 LEFT
-                    VirtualKeyCode::Right  => { ports[1].fetch_and(!0b0100_0000, Ordering::Relaxed); }, // P1 RIGHT 
-                    VirtualKeyCode::Z      => { ports[1].fetch_and(!0b0001_0000, Ordering::Relaxed); }, // P1 SHOOT
-                    VirtualKeyCode::C      => { ports[1].fetch_and(!0b0000_0001, Ordering::Relaxed); }, // COIN
-                    VirtualKeyCode::Return => { ports[1].fetch_and(!0b0000_0100, Ordering::Relaxed); }, // P1 START
+                    VirtualKeyCode::Left   => { interpreter.devices.read_ports[1] &= !0b0010_0000; }, // P1 LEFT
+                    VirtualKeyCode::Right  => { interpreter.devices.read_ports[1] &= !0b0100_0000; }, // P1 RIGHT 
+                    VirtualKeyCode::Z      => { interpreter.devices.read_ports[1] &= !0b0001_0000; }, // P1 SHOOT
+                    VirtualKeyCode::C      => { interpreter.devices.read_ports[1] &= !0b0000_0001; }, // COIN
+                    VirtualKeyCode::Return => { interpreter.devices.read_ports[1] &= !0b0000_0100; }, // P1 START
                     _ => (),
                 },
                 _ => ()
