@@ -2,6 +2,8 @@
 
 <head>
     <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SPACE INVADERS</title>
     <link rel="icon"
         href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAChklEQVR4Xu2aLW8VQRSGn9sS0pCGL0EQBIMpGBpEDSgEAgO48gcIhkAdAomoo00N4Q8UByQEgUCBqSBgWkxNU0EQfAlCSNs0J+GGuadzd2d2Z7t3mTNyds7Hvuc9Z2fmbI/MRy/z98cAMAZkjoClQOYEsCJoKWApkDkClgKZE8C+AilSYAqYVUyaB34nZtcEcF/pfAp8qmMnBQDXgWfKiWPA9zqOeWSPAt/U/A3geR07BkAd9P7KZs+AK8ATBeQ0IJTtj6/Az0iwDwPHHRlJqQ9Kxy3gdaTegeUpUsBnX5w94jyYAxYiHb0HPHJkfihQI9X5lxsASWDcq8QYkFMKXAIeKhLI3Lgztw5sRrLtFHDGkdkG3iodDzxzUWZS1ADfZzDKiRqLR3YjVOOdokQNgDa2wpeB006cLgB3VNyWgT/O3AxwNiq2sAasODIHgZtKxxLw3pnbAN7E2KlSA+Twca3EiD4MySboboxjwCIgm6H+8B2GtMoXgNSk4GEABEP1b6ExIKcUCMm7CiTaV5HCy5myGmAAeK6h9jV8CYwZA4ruJ6ukgN58+DZCCQIXpCLEl+QM0PvvUToMRd9PVmGAAaAOIMYAT2PkHbAVlMXhiw4AF9XyEDa2UgPa6gyNTA0wAFrqDRoDYhu1ZZ/BMXX7IzXoC/DLKUaHgBOqOL0EJgvq2ypwVT1/BZwrkJFeg77sCPFFbol2huktAyC8Rg+u1I0RrecjIP1Dd0jf73yBwU63xgwAhcB/zwD5lUV+aRk2PgOP1cPbwMkCGfnlRn69STqaqgFJnWxSmQHQJLpd0G0M6EKUmvTRGNAkul3QbQzoQpSa9NEY0CS6XdBtDOhClJr0MXsG7ALeGrRB5mAHsAAAAABJRU5ErkJggg==" />
     <style>
@@ -40,9 +42,10 @@
             background-repeat: no-repeat;
             background-attachment: fixed;
             background-size: cover;
+            background-position: center;
 
             font-family: 'Space Invaders', monospace;
-            font-size: 8px;
+            font-size: 0.5rem;
             line-height: 12px;
             color: white;
             background-color: black;
@@ -51,6 +54,12 @@
         .bottom-left {
             position: absolute;
             bottom: 5px;
+        }
+
+        @media screen and (max-width: 767px) {
+            .bottom-left {
+                display: none;
+            }
         }
 
         .bottom-right {
@@ -70,23 +79,44 @@
 
 <body>
     <div class="bottom-left">
-        <p>PRESS 'C' TO INSERT COINS</p>
-        <p>'BACKSPACE': IS 2PLAYER BUTTON</p>
-        <p>'ENTER': 1PLAYER BUTTON</p>
+        <p>PRESS 'C' TO INSERT A COIN</p>
+        <p>BACKSPACE: 2PLAYER BUTTON</p>
+        <p>ENTER: 1PLAYER BUTTON</p>
         <p>ARROWS MOVE THE SHIP</p>
-        <p>'Z': FIRE BUTTOn</p>
+        <p>Z: FIRE BUTTOn</p>
     </div>
     <div class="bottom-right">
         By <a href="https://github.com/Rodrigodd">Rodrigodd</a></p>
     </div>
     <div class='page'>
         <div class='screen'>
-            <canvas id='canvas' width='224' height='256'
-                style='transform: scale(2); transform-origin: top left'></canvas>
+            <canvas id='canvas' width='224' height='256' style='transform: scale(2); transform-origin: top left'></canvas>
         </div>
     </div>
     <script type="module">
         import init, { run_frame, key_down, key_up } from './pkg/space_invaders_wasm.js';
+
+        
+        function resize() {
+            var w = document.documentElement.clientWidth;
+            var h = document.documentElement.clientHeight;
+
+            const scale = Math.min(Math.floor(w/224), Math.floor(h/256));
+            console.log(scale);
+
+            const page = document.getElementsByClassName("page")[0];
+            page.style.width = 224*scale;
+
+            const screen = document.getElementsByClassName("screen")[0];
+            screen.style.width = 224*scale;
+            screen.style.height = 256*scale;
+
+            const canvas = document.getElementById("canvas");
+            canvas.style.transform = `scale(${scale})`;
+            // canvas.innerHTML = `<canvas id='canvas' width='224' height='256' style='transform: scale(${scale}); transform-origin: top left'></canvas>`;
+        }
+        window.addEventListener("resize", resize);
+        resize();
 
         async function run() {
             await init();
