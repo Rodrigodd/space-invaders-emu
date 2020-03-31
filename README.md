@@ -14,7 +14,6 @@ And for binary builds with the ```debug``` feature enable, press Escape to enter
 
 There you can use the command ```run``` to exit the debug mode, use ```bp <HEX ADRESS>``` to place a breakpoint in same opcode,  and ```runto <HEX ADRESS>``` to run until reach same opcode.
 
-
 # Compile
 
 To compile to windows, linux or macOS (I only tested for windows), run the command ```cargo run```. 
