@@ -2,7 +2,7 @@
 
 This is a emulator of the classic arcade game, Space Invaders (1978), write in Rust.
 
-## Test it: https://rodrigodd.github.io/space-invaders-emu/
+## Test it: https://rodrigodd.github.io/space-invaders-emu/index.html
 
 # Controls
 
