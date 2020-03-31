@@ -32,6 +32,7 @@ pub struct I8080State {
     SP: u16,
     PC: u16,
     pub interrupt_enabled: bool,
+    pub halt: bool,
 }
 #[allow(non_snake_case)]
 impl I8080State {
@@ -48,6 +49,7 @@ impl I8080State {
             SP: 0,
             PC: 0,
             interrupt_enabled: false,
+            halt: false,
         }
     }
 

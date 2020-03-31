@@ -250,7 +250,6 @@ impl<M: Memory, I: IODevices> Interpreter<M,I> {
         state.set_PC(entries[0]);
 
         Self {
-            
             #[cfg(feature = "debug")]
             debug: false,
             #[cfg(feature = "debug")]
@@ -311,6 +310,10 @@ impl<M: Memory, I: IODevices> Interpreter<M,I> {
 
     /// run for 'number_of_clocks' clocks
     pub fn run(&mut self, number_of_clocks: u32) {
+        if self.state.halt {
+            return;
+        }
+        
         self.target_clock += number_of_clocks;
         while self.clock_count < self.target_clock {
             #[cfg(feature = "debug")] {
@@ -404,6 +407,7 @@ impl<M: Memory, I: IODevices> Interpreter<M,I> {
     }
 
     pub fn interrupt(&mut self, opcode: u8) {
+        self.state.halt = false;
         let (_, clock) = Self::get_opcode_size_and_clock(opcode);
         self.clock_count += clock as u32;
         self.interpret_opcode(opcode);
@@ -425,7 +429,11 @@ impl<M: Memory, I: IODevices> Interpreter<M,I> {
                 unsafe { *r = self.memory.read(m); }
             },
             0b01110110 => { // HLT        | Halt                                 | 01110110        |  7   
-                println!("{:04x}  : op {:02x} is unimplemented", self.state.get_PC(), opcode);
+                self.state.halt = true;
+                if opcode == 0b01110110 { // if HLT
+                    self.target_clock = self.clock_count;
+                    return;
+                }
             },
             r | 0b00000110 => { // MVI  r     | Move immediate to register              | 00DDD110        |  7   
                 let immediate = self.memory.read(self.state.get_PC()-1);
