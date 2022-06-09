@@ -243,8 +243,7 @@ pub struct Interpreter<M: Memory, I: IODevices> {
     traced: Vec<Range<u16>>,
 }
 impl<M: Memory, I: IODevices> Interpreter<M,I> {
-    pub fn new(devices: I, mut memory: M, entries: &[u16]) -> Self {
-
+    pub fn new(devices: I, memory: M, entries: &[u16]) -> Self {
         let mut state = I8080State::new();
 
         state.set_PC(entries[0]);

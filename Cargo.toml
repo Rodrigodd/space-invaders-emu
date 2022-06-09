@@ -1,5 +1,6 @@
 [package]
 name = "space-invaders-emu"
+resolver = "2"
 version = "0.1.0"
 authors = ["Rodrigo Batista de Moraes <rodrigobatsmoraes@hotmail.com>"]
 edition = "2018"
@@ -18,6 +19,6 @@ debug = ["intel8080/debug"]
 intel8080 = { version = "0.1.0", path = "intel8080" }
 array-init = "0.1"
 
-pixels = "0.0.2"
-winit = "0.22"
+pixels = "0.9.0"
+winit = "0.26.1"
 rodio = "0.11"
