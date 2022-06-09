@@ -1,5 +1,5 @@
-use intel8080::{ IODevices, Memory };
 use crate::interpreter;
+use intel8080::{IODevices, Memory};
 
 struct TestDevices;
 impl IODevices for TestDevices {
@@ -15,14 +15,14 @@ impl IODevices for TestDevices {
             3 => {
                 println!();
                 std::process::exit(0)
-            },
+            }
             _ => (),
         };
     }
 }
 
 struct TestMemory {
-    memory: [u8; 0x4000]
+    memory: [u8; 0x4000],
 }
 impl Memory for TestMemory {
     fn read(&self, adress: u16) -> u8 {
@@ -64,12 +64,15 @@ pub fn main_loop(debug: bool) {
 
     let mut interpreter = interpreter::Interpreter::new(
         TestDevices,
-        TestMemory { memory: memory.clone(), },
+        TestMemory {
+            memory: memory.clone(),
+        },
         &[0x0],
         // debug
     );
-    
-    #[cfg(feature = "debug")] {
+
+    #[cfg(feature = "debug")]
+    {
         if debug {
             interpreter.enter_debug_mode();
         }

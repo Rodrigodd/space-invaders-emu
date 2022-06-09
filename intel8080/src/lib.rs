@@ -1,6 +1,6 @@
 pub mod dissasembler;
-pub mod interpreter;
 mod intel8080;
+pub mod interpreter;
 
 mod write_adapter;
 

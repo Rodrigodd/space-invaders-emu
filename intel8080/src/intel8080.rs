@@ -1,9 +1,9 @@
-pub trait IODevices : Send {
+pub trait IODevices: Send {
     fn read(&mut self, device: u8) -> u8;
     fn write(&mut self, device: u8, value: u8);
 }
 
-pub trait Memory : Send {
+pub trait Memory: Send {
     fn read(&self, adress: u16) -> u8;
     fn write(&mut self, adress: u16, value: u8);
 
@@ -11,12 +11,9 @@ pub trait Memory : Send {
 
     #[inline]
     fn read_u16(&self, adress: u16) -> u16 {
-        u16::from_le_bytes(
-            [self.read(adress), self.read(adress + 1)]
-        )
+        u16::from_le_bytes([self.read(adress), self.read(adress + 1)])
     }
 }
-
 
 #[repr(C)]
 #[allow(non_snake_case)]
@@ -55,38 +52,46 @@ impl I8080State {
 
     #[inline]
     pub fn get_PSW(&self) -> u16 {
-        unsafe {  u16::from_be(*(&self.A as *const u8 as *const u16)) }
+        unsafe { u16::from_be(*(&self.A as *const u8 as *const u16)) }
     }
     #[inline]
     pub fn set_PSW(&mut self, value: u16) {
-        unsafe { *(&mut self.A as *mut u8 as *mut u16) = value.to_be(); }
+        unsafe {
+            *(&mut self.A as *mut u8 as *mut u16) = value.to_be();
+        }
     }
 
     #[inline]
     pub fn get_BC(&self) -> u16 {
-        unsafe {  u16::from_be(*(&self.B as *const u8 as *const u16)) }
+        unsafe { u16::from_be(*(&self.B as *const u8 as *const u16)) }
     }
     #[inline]
     pub fn set_BC(&mut self, value: u16) {
-        unsafe { *(&mut self.B as *mut u8 as *mut u16) = value.to_be(); }
+        unsafe {
+            *(&mut self.B as *mut u8 as *mut u16) = value.to_be();
+        }
     }
 
     #[inline]
     pub fn get_DE(&self) -> u16 {
-        unsafe {  u16::from_be(*(&self.D as *const u8 as *const u16)) }
+        unsafe { u16::from_be(*(&self.D as *const u8 as *const u16)) }
     }
     #[inline]
     pub fn set_DE(&mut self, value: u16) {
-        unsafe { *(&mut self.D as *mut u8 as *mut u16) = value.to_be(); }
+        unsafe {
+            *(&mut self.D as *mut u8 as *mut u16) = value.to_be();
+        }
     }
 
     #[inline]
     pub fn get_HL(&self) -> u16 {
-        unsafe {  u16::from_be(*(&self.H as *const u8 as *const u16)) }
+        unsafe { u16::from_be(*(&self.H as *const u8 as *const u16)) }
     }
     #[inline]
     pub fn set_HL(&mut self, value: u16) {
-        unsafe { *(&mut self.H as *mut u8 as *mut u16) = value.to_be(); }
+        unsafe {
+            *(&mut self.H as *mut u8 as *mut u16) = value.to_be();
+        }
     }
 
     #[inline]
@@ -114,9 +119,7 @@ impl I8080State {
     #[inline]
     pub fn pop_stack<M: Memory>(&mut self, memory: &M) -> u16 {
         self.SP = (u16::from_le(self.SP) + 2).to_le();
-        memory.read(self.get_SP() - 2) as u16 |
-        (memory.read(self.get_SP() - 1) as u16) << 8
-        
+        memory.read(self.get_SP() - 2) as u16 | (memory.read(self.get_SP() - 1) as u16) << 8
     }
 
     #[inline]
@@ -173,7 +176,12 @@ impl I8080State {
 
     pub fn print_state<W: std::fmt::Write>(&self, w: &mut W) {
         writeln!(w, "B  C  D  E  H  L  A  SZ_A_P_C <- Flags").unwrap();
-        writeln!(w, "{:02x} {:02x} {:02x} {:02x} {:02x} {:02x} {:02x} {:08b}", self.B, self.C, self.D, self.E, self.H, self.L, self.A, self.Flags).unwrap();
+        writeln!(
+            w,
+            "{:02x} {:02x} {:02x} {:02x} {:02x} {:02x} {:02x} {:08b}",
+            self.B, self.C, self.D, self.E, self.H, self.L, self.A, self.Flags
+        )
+        .unwrap();
         writeln!(w, "PC: {:04x}   SP: {:04x}", self.get_PC(), self.get_SP()).unwrap();
     }
 }

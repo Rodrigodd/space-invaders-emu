@@ -1,9 +1,9 @@
-use std::io;
 use std::env::args;
+use std::io;
 
-mod write_adapter;
 mod space_invaders;
 mod test_machine;
+mod write_adapter;
 
 use intel8080::{dissasembler, interpreter};
 
@@ -11,7 +11,6 @@ use dissasembler::*;
 use write_adapter::WriteAdapter;
 
 fn main() {
-
     let mut args = args();
     let _ = args.next();
     let mut disassembly = false;
