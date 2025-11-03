@@ -1,5 +1,6 @@
 use std::fmt;
 use std::io;
+
 /// adapter from fmt::Write to io::Write
 pub struct WriteAdapter<W>(pub W);
 

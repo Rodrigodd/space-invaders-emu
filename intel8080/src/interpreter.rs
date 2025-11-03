@@ -244,6 +244,9 @@ impl<M: Memory, I: IODevices> Interpreter<M, I> {
 
         state.set_PC(entries[0]);
 
+        #[cfg(feature = "debug")]
+        let mut memory = memory;
+
         Self {
             #[cfg(feature = "debug")]
             debug: false,
@@ -251,7 +254,6 @@ impl<M: Memory, I: IODevices> Interpreter<M, I> {
             breakpoints: HashSet::new(),
             #[cfg(feature = "debug")]
             traced: dissasembler::trace(&memory.get_rom(), entries),
-
             state,
             devices,
             memory,
@@ -566,7 +568,10 @@ impl<M: Memory, I: IODevices> Interpreter<M, I> {
                                         while self.state.get_PC() != adress {
                                             safety += 1;
                                             if safety > 100_000 {
-                                                println!("safety: after 100_000 steps, it don't reach the adress {:04x} yet", adress);
+                                                println!(
+                                                    "safety: after 100_000 steps, it don't reach the adress {:04x} yet",
+                                                    adress
+                                                );
                                                 break;
                                             }
                                             let opcode = self.memory.read(self.state.get_PC());
@@ -580,7 +585,9 @@ impl<M: Memory, I: IODevices> Interpreter<M, I> {
                                         println!("error: invalid adress");
                                     }
                                 } else {
-                                    println!("use 'runto <ADRESS>', where <ADRESS> is the hexadecimal adress of the opcode it will stop when reached.");
+                                    println!(
+                                        "use 'runto <ADRESS>', where <ADRESS> is the hexadecimal adress of the opcode it will stop when reached."
+                                    );
                                 }
                             } else if command.starts_with("interrupt") {
                                 if let Some(opcode) = input.next() {
@@ -591,7 +598,9 @@ impl<M: Memory, I: IODevices> Interpreter<M, I> {
                                         println!("error: invalid opcode");
                                     }
                                 } else {
-                                    println!("use 'interrupt <OPCODE>', where <OPCODE> is the hexadecimal that opcode will be run.");
+                                    println!(
+                                        "use 'interrupt <OPCODE>', where <OPCODE> is the hexadecimal that opcode will be run."
+                                    );
                                 }
                             } else if command.starts_with("run") {
                                 self.debug = false;
@@ -604,7 +613,9 @@ impl<M: Memory, I: IODevices> Interpreter<M, I> {
                                         println!("error: invalid adress");
                                     }
                                 } else {
-                                    println!("use 'bp <ADRESS>', where <ADRESS> is the hexadecimal adress of the opcode it will break when reached.");
+                                    println!(
+                                        "use 'bp <ADRESS>', where <ADRESS> is the hexadecimal adress of the opcode it will break when reached."
+                                    );
                                 }
                             }
                         } else {
@@ -668,7 +679,6 @@ impl<M: Memory, I: IODevices> Interpreter<M, I> {
                 self.state.halt = true;
                 if opcode == 0b01110110 { // if HLT
                     self.target_clock = self.clock_count;
-                    return;
                 }
             },
             r | 0b00000110 => { // MVI  r     | Move immediate to register              | 00DDD110        |  7
@@ -732,15 +742,15 @@ impl<M: Memory, I: IODevices> Interpreter<M, I> {
                 self.state.A = sum;
             },
             r 0b10100000 => { // ANA  r     | And register with A                  | 10100SSS        |  4
-                self.state.A = self.state.A & r;
+                self.state.A &=  r;
                 self.state.set_flags(self.state.A, false, self.state.on_aux_carry());
             },
             r 0b10101000 => { // XRA  r     | Exclusive Or register with A         | 10101SSS        |  4
-                self.state.A = self.state.A ^ r;
+                self.state.A ^= r;
                 self.state.set_flags(self.state.A, false, self.state.on_aux_carry());
             },
             r 0b10110000 => { // ORA  r     | Or register with A                   | 10110SSS        |  4
-                self.state.A = self.state.A | r;
+                self.state.A |= r;
                 self.state.set_flags(self.state.A, false, self.state.on_aux_carry());
             },
             r 0b10111000 => { // CMP  r     | Compare register with A              | 10111SSS        |  4
@@ -773,17 +783,17 @@ impl<M: Memory, I: IODevices> Interpreter<M, I> {
             },
             0b10100110 => { // ANA  M     | And memory with A                    | 10100110        |  7
                 let value = self.memory.read(self.state.get_HL());
-                self.state.A = self.state.A & value;
+                self.state.A &= value;
                 self.state.set_flags(self.state.A, false, self.state.on_aux_carry());
             },
             0b10101110 => { // XRA  M     | Exclusive Or memory with A           | 10101110        |  7
                 let value = self.memory.read(self.state.get_HL());
-                self.state.A = self.state.A ^ value;
+                self.state.A ^= value;
                 self.state.set_flags(self.state.A, false, self.state.on_aux_carry());
             },
             0b10110110 => { // ORA  M     | Or memory with A                     | 10110110        |  7
                 let value = self.memory.read(self.state.get_HL());
-                self.state.A = self.state.A | value;
+                self.state.A |= value;
                 self.state.set_flags(self.state.A, false, self.state.on_aux_carry());
             },
             0b10111110 => { // CMP  M     | Compare memory with A                | 10111110        |  7
@@ -817,17 +827,17 @@ impl<M: Memory, I: IODevices> Interpreter<M, I> {
             },
             0b11100110 => { // ANI        | And immediate with A                 | 11100110        |  7
                 let immediate = self.memory.read(self.state.get_PC()-1);
-                self.state.A = self.state.A & immediate;
+                self.state.A &= immediate;
                 self.state.set_flags(self.state.A, false, self.state.on_aux_carry());
             },
             0b11101110 => { // XRI        | Exclusive Or immediate with A        | 11101110        |  7
                 let immediate = self.memory.read(self.state.get_PC()-1);
-                self.state.A = self.state.A ^ immediate;
+                self.state.A ^= immediate;
                 self.state.set_flags(self.state.A, false, self.state.on_aux_carry());
             },
             0b11110110 => { // ORI        | Or immediate with A                  | 11110110        |  7
                 let immediate = self.memory.read(self.state.get_PC()-1);
-                self.state.A = self.state.A | immediate;
+                self.state.A |= immediate;
                 self.state.set_flags(self.state.A, false, self.state.on_aux_carry());
             },
             0b11111110 => { // CPI        | Compare immediate with A             | 11111110        |  7

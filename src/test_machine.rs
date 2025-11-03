@@ -37,12 +37,10 @@ impl Memory for TestMemory {
     fn write(&mut self, adress: u16, value: u8) {
         if adress < 0x05a4 {
             println!("overwriting code at 0x{:04x}!", adress);
+        } else if (adress as usize) < self.memory.len() {
+            self.memory[adress as usize] = value;
         } else {
-            if (adress as usize) < self.memory.len() {
-                self.memory[adress as usize] = value;
-            } else {
-                println!("Write out of memory! At 0x{:04x}!", adress);
-            }
+            println!("Write out of memory! At 0x{:04x}!", adress);
         }
     }
 
@@ -55,18 +53,29 @@ pub fn load_rom(memory: &mut [u8]) {
     use std::fs;
     use std::io::Read;
     let mut file = fs::File::open("rom/test.com").unwrap();
-    file.read(memory).unwrap();
+    let mut offset = 0;
+    loop {
+        match file.read(&mut memory[offset..]) {
+            Ok(0) => break,
+            Ok(n) => offset += n,
+            Err(e) => panic!("Failed to read file: {}", e),
+        }
+        if offset >= memory.len() {
+            break;
+        }
+    }
 }
 
 pub fn main_loop(debug: bool) {
+    #[cfg(not(feature = "debug"))]
+    let _ = debug;
+
     let mut memory = [0; 0x4000];
     load_rom(&mut memory);
 
     let mut interpreter = interpreter::Interpreter::new(
         TestDevices,
-        TestMemory {
-            memory: memory.clone(),
-        },
+        TestMemory { memory },
         &[0x0],
         // debug
     );

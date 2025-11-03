@@ -185,3 +185,9 @@ impl I8080State {
         writeln!(w, "PC: {:04x}   SP: {:04x}", self.get_PC(), self.get_SP()).unwrap();
     }
 }
+
+impl Default for I8080State {
+    fn default() -> Self {
+        Self::new()
+    }
+}

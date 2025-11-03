@@ -35,15 +35,13 @@ fn main() {
         } else {
             test_machine::main_loop(debug);
         }
+    } else if disassembly {
+        use space_invaders::load_rom;
+        let mut rom = [0; 0x2000];
+        load_rom(&mut rom);
+        let mut stdout = WriteAdapter(io::stdout());
+        dissasembly(&mut stdout, &rom, &[0x0u16, 0x8, 0x10]).unwrap();
     } else {
-        if disassembly {
-            use space_invaders::load_rom;
-            let mut rom = [0; 0x2000];
-            load_rom(&mut rom);
-            let mut stdout = WriteAdapter(io::stdout());
-            dissasembly(&mut stdout, &rom, &[0x0u16, 0x8, 0x10]).unwrap();
-        } else {
-            space_invaders::main_loop(debug);
-        }
+        space_invaders::main_loop(debug);
     }
 }

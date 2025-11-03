@@ -1,6 +1,7 @@
-use std::sync::mpsc::{channel, Sender};
+use std::sync::mpsc::{Sender, channel};
 
-use intel8080::{interpreter, IODevices, Memory};
+use intel8080::{IODevices, Memory, interpreter};
+use rodio::Source;
 
 use std::{io::Cursor, thread};
 
@@ -12,13 +13,10 @@ use winit::{
 
 use pixels::{Pixels, SurfaceTexture};
 
-use rodio;
-use rodio::Source;
-
 const SCREEN_WIDTH: u32 = 224;
 const SCREEN_HEIGHT: u32 = 256;
 
-static SOUND_BANK: [&'static [u8]; 9] = [
+static SOUND_BANK: [&[u8]; 9] = [
     include_bytes!("../sound/0.wav"),
     include_bytes!("../sound/1.wav"),
     include_bytes!("../sound/2.wav"),
@@ -212,7 +210,7 @@ pub fn load_rom(buf: &mut [u8]) {
     let mut andress = 0;
     for e in ['h', 'g', 'f', 'e'].iter() {
         let mut file = fs::File::open(format!("rom/invaders.{}", e)).unwrap();
-        file.read(&mut buf[andress..andress + 0x800]).unwrap();
+        file.read_exact(&mut buf[andress..andress + 0x800]).unwrap();
         andress += 0x800;
     }
 }
@@ -235,24 +233,27 @@ fn render_screen(screen: &mut [u8], memory: &[u8]) {
             let m = memory[i / 8];
             let c = if (m >> (i % 8)) & 0x1 != 0 { 0xff } else { 0x0 };
             let p = ((SCREEN_HEIGHT - y - 1) * SCREEN_WIDTH + x) as usize * 4;
-            screen[p] = if y >= 72 || (y < 16 && (x < 16 || x >= 102)) {
+            screen[p] = if y >= 72 || (y < 16 && !(16..102).contains(&x)) {
                 c
             } else {
                 0
             };
-            screen[p + 1] = if y < 192 || y >= 224 { c } else { 0 };
-            screen[p + 2] = if (y >= 72 && y < 192) || y >= 224 || (y < 16 && (x < 16 || x >= 102))
-            {
-                c
-            } else {
-                0
-            };
+            screen[p + 1] = if !(192..224).contains(&y) { c } else { 0 };
+            screen[p + 2] =
+                if (72..192).contains(&y) || y >= 224 || (y < 16 && !(16..102).contains(&x)) {
+                    c
+                } else {
+                    0
+                };
             screen[p + 3] = 0xff;
         }
     }
 }
 
 pub fn main_loop(debug: bool) {
+    #[cfg(not(feature = "debug"))]
+    let _ = debug;
+
     let event_loop = EventLoop::new();
 
     // let window = WindowBuilder::new()
@@ -266,11 +267,7 @@ pub fn main_loop(debug: bool) {
 
     let mut pixels = Pixels::new(SCREEN_WIDTH, SCREEN_HEIGHT, surface_texture).unwrap();
 
-    let ports = [
-        (0b0000_1111).into(),
-        (0b0000_1000).into(),
-        (0b0000_0000).into(),
-    ];
+    let ports = [0b0000_1111, 0b0000_1000, 0b0000_0000];
 
     let mut memory = [0; 0x4000];
     load_rom(&mut memory);
@@ -394,7 +391,7 @@ fn create_window(
     let window = winit::window::WindowBuilder::new()
         .with_visible(false)
         .with_title(title)
-        .build(&event_loop)
+        .build(event_loop)
         .unwrap();
     let hidpi_factor = window.scale_factor();
 

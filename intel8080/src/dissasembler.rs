@@ -4,7 +4,7 @@ use std::ops::Range;
 
 pub fn dissasembly_around<W: Write>(
     w: &mut W,
-    traced: &Vec<Range<u16>>,
+    traced: &[Range<u16>],
     rom: &[u8],
     pc: u16,
 ) -> Result<(), fmt::Error> {
@@ -76,7 +76,7 @@ pub fn dissasembly<W: Write>(w: &mut W, rom: &[u8], entries: &[u16]) -> Result<(
                 if pc as usize >= rom.len() {
                     break;
                 }
-                pc = pc + offset as u16;
+                pc += offset as u16;
             }
         }
     }
@@ -118,7 +118,7 @@ pub fn trace(rom: &[u8], entries: &[u16]) -> Vec<Range<u16>> {
         // println!("--jump {:04x}", pc);
     }
 
-    fn check_read(pc: u16, read: &Vec<Range<u16>>) -> bool {
+    fn check_read(pc: u16, read: &[Range<u16>]) -> bool {
         use std::cmp::Ordering;
         read.binary_search_by(|r: &Range<u16>| {
             if pc < r.start {
@@ -134,7 +134,9 @@ pub fn trace(rom: &[u8], entries: &[u16]) -> Vec<Range<u16>> {
     }
 
     let mut pc = entries[0];
-    let mut read = vec![pc..pc];
+    let mut read = Vec::new();
+    read.push(pc..pc);
+
     let mut jumps = entries[1..].to_owned();
     let mut safety_counter = 0;
 
@@ -145,18 +147,18 @@ pub fn trace(rom: &[u8], entries: &[u16]) -> Vec<Range<u16>> {
         }
 
         let (offset, jmp) = trace_opcode(pc, rom);
-        if let Some(jmp) = jmp {
-            if jmp < 0x4000 {
-                let i = match jumps.binary_search(&pc) {
-                    Ok(i) => i,
-                    Err(i) => i,
-                };
-                jumps.insert(i, jmp);
-            }
+        if let Some(jmp) = jmp
+            && jmp < 0x4000
+        {
+            let i = match jumps.binary_search(&pc) {
+                Ok(i) => i,
+                Err(i) => i,
+            };
+            jumps.insert(i, jmp);
         }
         if add_next_to_read(pc, offset & 0b11, &mut read) && offset < 8 {
-            pc = pc + offset as u16;
-            pc = pc & 0x3fff;
+            pc += offset as u16;
+            pc &= 0x3fff;
         } else {
             while let Some(jmp) = jumps.pop() {
                 if !check_read(jmp, &read) {
