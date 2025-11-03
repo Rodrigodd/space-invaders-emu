@@ -402,25 +402,28 @@ fn create_window(
     let width = SCREEN_WIDTH as f64;
     let height = SCREEN_HEIGHT as f64;
     let default_size;
-    if let Some(monitor) = window.current_monitor() {
-        let (monitor_width, monitor_height) = {
-            let size = monitor.size();
-            (
-                size.width as f64 / hidpi_factor,
-                size.height as f64 / hidpi_factor,
-            )
-        };
-        let scale = (monitor_height / height * 2.0 / 3.0).round();
+    match window.current_monitor() {
+        Some(monitor) => {
+            let (monitor_width, monitor_height) = {
+                let size = monitor.size();
+                (
+                    size.width as f64 / hidpi_factor,
+                    size.height as f64 / hidpi_factor,
+                )
+            };
+            let scale = (monitor_height / height * 2.0 / 3.0).round();
 
-        // Resize, center, and display the window
-        default_size = LogicalSize::new(width * scale, height * scale);
-        let center = LogicalPosition::new(
-            (monitor_width - width * scale) / 2.0,
-            (monitor_height - height * scale) / 2.0,
-        );
-        window.set_outer_position(center);
-    } else {
-        default_size = LogicalSize::new(width, height);
+            // Resize, center, and display the window
+            default_size = LogicalSize::new(width * scale, height * scale);
+            let center = LogicalPosition::new(
+                (monitor_width - width * scale) / 2.0,
+                (monitor_height - height * scale) / 2.0,
+            );
+            window.set_outer_position(center);
+        }
+        _ => {
+            default_size = LogicalSize::new(width, height);
+        }
     };
     let min_size: LogicalSize<f64> = PhysicalSize::new(width, height).to_logical(hidpi_factor);
     window.set_min_inner_size(Some(min_size));
