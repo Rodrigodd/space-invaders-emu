@@ -1,22 +1,15 @@
-use intel8080::{interpreter::Interpreter, IODevices, Memory};
+use intel8080::{IODevices, Memory, interpreter::Interpreter};
 use wasm_bindgen::prelude::*;
 
-static mut INTERPRETER: Option<Interpreter<SpaceInvadersMemory, SpaceInvadersDevices>> = None;
+use std::sync::{LazyLock, Mutex};
 
-fn get_interpreter() -> &'static mut Interpreter<SpaceInvadersMemory, SpaceInvadersDevices> {
-    if let Some(interpreter) = unsafe { INTERPRETER.as_mut() } {
-        interpreter
-    } else {
-        let interpreter = create_interpreter();
-        unsafe {
-            INTERPRETER = Some(interpreter);
-        }
-        unsafe { INTERPRETER.as_mut().unwrap() }
-    }
+static INTERPRETER: LazyLock<Mutex<Interpreter<SpaceInvadersMemory, SpaceInvadersDevices>>> =
+    LazyLock::new(|| Mutex::new(create_interpreter()));
+
+fn get_interpreter()
+-> std::sync::MutexGuard<'static, Interpreter<SpaceInvadersMemory, SpaceInvadersDevices>> {
+    INTERPRETER.lock().unwrap()
 }
-
-static mut SCREEN: [u8; (SCREEN_WIDTH * SCREEN_HEIGHT * 4) as usize] =
-    [0; (SCREEN_WIDTH * SCREEN_HEIGHT * 4) as usize];
 
 pub const SCREEN_WIDTH: u32 = 224;
 pub const SCREEN_HEIGHT: u32 = 256;
@@ -121,11 +114,9 @@ impl Memory for SpaceInvadersMemory {
         if adress > 0x4000 {
             adress = (adress % 0x2000) + 0x2000;
         }
-        if (adress as usize) < self.memory.len() {
-            if adress >= 0x2000 {
-                // adress < 0x2000 is ROM
-                self.memory[adress as usize] = value;
-            }
+        if (adress as usize) < self.memory.len() && adress >= 0x2000 {
+            // adress < 0x2000 is ROM
+            self.memory[adress as usize] = value;
         }
     }
 
@@ -139,10 +130,10 @@ impl Memory for SpaceInvadersMemory {
 }
 
 pub fn load_rom(buf: &mut [u8]) {
-    const H: &'static [u8] = include_bytes!("../../rom/invaders.h");
-    const G: &'static [u8] = include_bytes!("../../rom/invaders.g");
-    const F: &'static [u8] = include_bytes!("../../rom/invaders.f");
-    const E: &'static [u8] = include_bytes!("../../rom/invaders.e");
+    const H: &[u8] = include_bytes!("../../rom/invaders.h");
+    const G: &[u8] = include_bytes!("../../rom/invaders.g");
+    const F: &[u8] = include_bytes!("../../rom/invaders.f");
+    const E: &[u8] = include_bytes!("../../rom/invaders.e");
 
     buf[0..H.len()].clone_from_slice(H);
     buf[0x800..0x800 + G.len()].clone_from_slice(G);
@@ -157,36 +148,32 @@ pub fn render_screen(screen: &mut [u8], memory: &[u8]) {
             let m = memory[i / 8];
             let c = if (m >> (i % 8)) & 0x1 != 0 { 0xff } else { 0x0 };
             let p = ((SCREEN_HEIGHT - y - 1) * SCREEN_WIDTH + x) as usize * 4;
-            screen[p] = if y >= 72 || (y < 16 && (x < 16 || x >= 102)) {
+            screen[p] = if y >= 72 || (y < 16 && !(16..102).contains(&x)) {
                 c
             } else {
                 0
             };
-            screen[p + 1] = if y < 192 || y >= 224 { c } else { 0 };
-            screen[p + 2] = if (y >= 72 && y < 192) || y >= 224 || (y < 16 && (x < 16 || x >= 102))
-            {
-                c
-            } else {
-                0
-            };
+            screen[p + 1] = if !(192..224).contains(&y) { c } else { 0 };
+            screen[p + 2] =
+                if (72..192).contains(&y) || y >= 224 || (y < 16 && !(16..102).contains(&x)) {
+                    c
+                } else {
+                    0
+                };
             screen[p + 3] = c;
         }
     }
 }
 
 pub fn create_interpreter() -> Interpreter<SpaceInvadersMemory, SpaceInvadersDevices> {
-    let ports = [
-        (0b0000_1111).into(),
-        (0b0000_1000).into(),
-        (0b0000_0000).into(),
-    ];
+    let ports = [0b0000_1111, 0b0000_1000, 0b0000_0000];
 
     let mut memory = [0; 0x4000];
     load_rom(&mut memory);
 
     Interpreter::new(
         SpaceInvadersDevices::new(ports),
-        SpaceInvadersMemory { memory: memory },
+        SpaceInvadersMemory { memory },
         &[0x0u16, 0x8, 0x10],
     )
 }
@@ -200,7 +187,7 @@ extern "C" {
 
 #[wasm_bindgen]
 pub fn key_down(key: u8) {
-    let interpreter = get_interpreter();
+    let mut interpreter = get_interpreter();
     match key {
         1 => {
             // LEFT
@@ -232,7 +219,7 @@ pub fn key_down(key: u8) {
 
 #[wasm_bindgen]
 pub fn key_up(key: u8) {
-    let interpreter = get_interpreter();
+    let mut interpreter = get_interpreter();
     match key {
         1 => {
             // LEFT
@@ -264,14 +251,16 @@ pub fn key_up(key: u8) {
 
 #[wasm_bindgen]
 pub fn run_frame() -> Box<[u8]> {
-    let interpreter = get_interpreter();
+    let mut interpreter = get_interpreter();
 
     interpreter.run(2_000_000 / 120);
     interpreter.interrupt(0b11010111); // RST 2 (0xd7)
     interpreter.run(2_000_000 / 120);
     interpreter.interrupt(0b11001111); // RST 1 (0xcf)
 
-    render_screen(unsafe { &mut SCREEN }, &interpreter.memory.memory[0x2400..]);
+    let mut screen: [u8; (SCREEN_WIDTH * SCREEN_HEIGHT * 4) as usize] =
+        [0; (SCREEN_WIDTH * SCREEN_HEIGHT * 4) as usize];
+    render_screen(&mut screen, &interpreter.memory.memory[0x2400..]);
 
-    unsafe { SCREEN.to_vec().into_boxed_slice() }
+    screen.to_vec().into_boxed_slice()
 }

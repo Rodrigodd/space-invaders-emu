@@ -3,64 +3,55 @@ import * as __wbg_star0 from './snippets/space-invaders-wasm-568027c22d8c6703/so
 let wasm;
 
 /**
-* @param {number} key
-*/
+ * @param {number} key
+ */
 export function key_down(key) {
     wasm.key_down(key);
 }
 
 /**
-* @param {number} key
-*/
+ * @param {number} key
+ */
 export function key_up(key) {
     wasm.key_up(key);
 }
 
-let cachegetInt32Memory0 = null;
-function getInt32Memory0() {
-    if (cachegetInt32Memory0 === null || cachegetInt32Memory0.buffer !== wasm.memory.buffer) {
-        cachegetInt32Memory0 = new Int32Array(wasm.memory.buffer);
-    }
-    return cachegetInt32Memory0;
-}
+let cachedUint8ArrayMemory0 = null;
 
-let cachegetUint8Memory0 = null;
-function getUint8Memory0() {
-    if (cachegetUint8Memory0 === null || cachegetUint8Memory0.buffer !== wasm.memory.buffer) {
-        cachegetUint8Memory0 = new Uint8Array(wasm.memory.buffer);
+function getUint8ArrayMemory0() {
+    if (cachedUint8ArrayMemory0 === null || cachedUint8ArrayMemory0.byteLength === 0) {
+        cachedUint8ArrayMemory0 = new Uint8Array(wasm.memory.buffer);
     }
-    return cachegetUint8Memory0;
+    return cachedUint8ArrayMemory0;
 }
 
 function getArrayU8FromWasm0(ptr, len) {
-    return getUint8Memory0().subarray(ptr / 1, ptr / 1 + len);
+    ptr = ptr >>> 0;
+    return getUint8ArrayMemory0().subarray(ptr / 1, ptr / 1 + len);
 }
 /**
-* @returns {Uint8Array}
-*/
+ * @returns {Uint8Array}
+ */
 export function run_frame() {
-    try {
-        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-        wasm.run_frame(retptr);
-        var r0 = getInt32Memory0()[retptr / 4 + 0];
-        var r1 = getInt32Memory0()[retptr / 4 + 1];
-        var v0 = getArrayU8FromWasm0(r0, r1).slice();
-        wasm.__wbindgen_free(r0, r1 * 1);
-        return v0;
-    } finally {
-        wasm.__wbindgen_add_to_stack_pointer(16);
-    }
+    const ret = wasm.run_frame();
+    var v1 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 1, 1);
+    return v1;
 }
 
-async function load(module, imports) {
+const EXPECTED_RESPONSE_TYPES = new Set(['basic', 'cors', 'default']);
+
+async function __wbg_load(module, imports) {
     if (typeof Response === 'function' && module instanceof Response) {
         if (typeof WebAssembly.instantiateStreaming === 'function') {
             try {
                 return await WebAssembly.instantiateStreaming(module, imports);
 
             } catch (e) {
-                if (module.headers.get('Content-Type') != 'application/wasm') {
-                    console.warn("`WebAssembly.instantiateStreaming` failed because your server does not serve wasm with `application/wasm` MIME type. Falling back to `WebAssembly.instantiate` which is slower. Original error:\n", e);
+                const validResponse = module.ok && EXPECTED_RESPONSE_TYPES.has(module.type);
+
+                if (validResponse && module.headers.get('Content-Type') !== 'application/wasm') {
+                    console.warn("`WebAssembly.instantiateStreaming` failed because your server does not serve Wasm with `application/wasm` MIME type. Falling back to `WebAssembly.instantiate` which is slower. Original error:\n", e);
 
                 } else {
                     throw e;
@@ -83,26 +74,82 @@ async function load(module, imports) {
     }
 }
 
-async function init(input) {
-    if (typeof input === 'undefined') {
-        input = new URL('space_invaders_wasm_bg.wasm', import.meta.url);
-    }
+function __wbg_get_imports() {
     const imports = {};
+    imports.wbg = {};
+    imports.wbg.__wbindgen_init_externref_table = function() {
+        const table = wasm.__wbindgen_externrefs;
+        const offset = table.grow(4);
+        table.set(0, undefined);
+        table.set(offset + 0, undefined);
+        table.set(offset + 1, null);
+        table.set(offset + 2, true);
+        table.set(offset + 3, false);
+        ;
+    };
     imports['./snippets/space-invaders-wasm-568027c22d8c6703/sound.js'] = __wbg_star0;
 
-    if (typeof input === 'string' || (typeof Request === 'function' && input instanceof Request) || (typeof URL === 'function' && input instanceof URL)) {
-        input = fetch(input);
-    }
+    return imports;
+}
 
-
-
-    const { instance, module } = await load(await input, imports);
-
+function __wbg_finalize_init(instance, module) {
     wasm = instance.exports;
-    init.__wbindgen_wasm_module = module;
+    __wbg_init.__wbindgen_wasm_module = module;
+    cachedUint8ArrayMemory0 = null;
 
+
+    wasm.__wbindgen_start();
     return wasm;
 }
 
-export default init;
+function initSync(module) {
+    if (wasm !== undefined) return wasm;
 
+
+    if (typeof module !== 'undefined') {
+        if (Object.getPrototypeOf(module) === Object.prototype) {
+            ({module} = module)
+        } else {
+            console.warn('using deprecated parameters for `initSync()`; pass a single object instead')
+        }
+    }
+
+    const imports = __wbg_get_imports();
+
+    if (!(module instanceof WebAssembly.Module)) {
+        module = new WebAssembly.Module(module);
+    }
+
+    const instance = new WebAssembly.Instance(module, imports);
+
+    return __wbg_finalize_init(instance, module);
+}
+
+async function __wbg_init(module_or_path) {
+    if (wasm !== undefined) return wasm;
+
+
+    if (typeof module_or_path !== 'undefined') {
+        if (Object.getPrototypeOf(module_or_path) === Object.prototype) {
+            ({module_or_path} = module_or_path)
+        } else {
+            console.warn('using deprecated parameters for the initialization function; pass a single object instead')
+        }
+    }
+
+    if (typeof module_or_path === 'undefined') {
+        module_or_path = new URL('space_invaders_wasm_bg.wasm', import.meta.url);
+    }
+    const imports = __wbg_get_imports();
+
+    if (typeof module_or_path === 'string' || (typeof Request === 'function' && module_or_path instanceof Request) || (typeof URL === 'function' && module_or_path instanceof URL)) {
+        module_or_path = fetch(module_or_path);
+    }
+
+    const { instance, module } = await __wbg_load(await module_or_path, imports);
+
+    return __wbg_finalize_init(instance, module);
+}
+
+export { initSync };
+export default __wbg_init;

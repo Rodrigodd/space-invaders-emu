@@ -98,8 +98,8 @@
 
         
         function resize() {
-            var w = document.documentElement.clientWidth;
-            var h = document.documentElement.clientHeight;
+            var w = window.innerWidth || document.documentElement.clientWidth;
+            var h = window.innerHeight || document.documentElement.clientHeight;
 
             const scale = Math.min(Math.floor(w/224), Math.floor(h/256));
             console.log(scale);
